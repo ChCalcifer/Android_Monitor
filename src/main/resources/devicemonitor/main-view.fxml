@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.Canvas?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.devicemonitor.controller.MainController"
+      alignment="TOP_CENTER"
+      spacing="30"
+      prefHeight="1500"
+      prefWidth="1500"
+      style="-fx-padding: 30;"
+      stylesheets="@style.css">
+
+    <!-- 标题 -->
+    <HBox alignment="CENTER" style="-fx-background-color: #3498db; -fx-padding: 15;">
+        <Label text="Device Monitor" style="-fx-font-size: 36px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <Label fx:id="statusLabel"
+           text="正在初始化..."
+           style="-fx-font-size: 18px; -fx-text-fill: #34495e; -fx-padding: 0 0 15 0;"/>
+
+    <!-- 状态指示灯容器（增加动态边距） -->
+    <VBox spacing="15" alignment="CENTER" VBox.vgrow="ALWAYS">
+        <VBox fx:id="cpuFrequenciesBox" spacing="8" style="-fx-padding: 10;"/>
+    </VBox>
+
+    <!-- CPU频率显示区域（滚动条支持） -->
+    <ScrollPane fitToWidth="true" style="-fx-background: #f8f9fa;">
+        <VBox fx:id="cpuFrequenciesBox" spacing="8" style="-fx-padding: 10;"/>
+    </ScrollPane>
+</VBox>

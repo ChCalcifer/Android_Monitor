@@ -1,12 +1,12 @@
 package com.devicemonitor.utils;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.exec.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,42 +30,50 @@ public class ADBUtil {
         }
     }
 
-    public static String getCPUFrequency() {
+    public static List<String> getCPUFrequencies() {
         try {
-            String output = executeCommand(ADB_PATH + " shell cat /proc/cpuinfo");
-            return parseCPUFrequency(output);
+            // 增加超时和错误处理
+            String output = executeCommand(ADB_PATH + " shell \"cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2> /dev/null\"");
+            List<String> result = parseCPUFrequencies(output);
+            return result.isEmpty() ?
+                    Collections.singletonList("No frequency data") : result;
         } catch (Exception e) {
-            return "N/A";
+            return Collections.singletonList("ADB Error: " + e.getMessage());
         }
     }
 
-    private static String parseCPUFrequency(String output) {
-        Pattern pattern = Pattern.compile("cpu MHz\\s+:\\s+(\\d+\\.\\d+)");
+    private static List<String> parseCPUFrequencies(String output) {
+        List<String> frequencies = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(output);
-        if(matcher.find()) {
-            return String.format("%.2f MHz", Float.parseFloat(matcher.group(1)));
+        int coreIndex = 0;
+
+        while (matcher.find()) {
+            int kHz = Integer.parseInt(matcher.group());
+            double MHz = kHz / 1000.0;
+            frequencies.add(String.format("CPU %d: %.1f MHz", coreIndex++, MHz));
         }
-        return "N/A";
+        return frequencies.isEmpty() ? Collections.singletonList("N/A") : frequencies;
     }
 
     private static String executeCommand(String command) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
-        CommandLine cmdLine = CommandLine.parse(command);
-        DefaultExecutor executor = new DefaultExecutor();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
 
-        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, errorStream);
-        executor.setStreamHandler(streamHandler);
+            CommandLine cmdLine = CommandLine.parse(command);
+            DefaultExecutor executor = new DefaultExecutor();
+            executor.setStreamHandler(new PumpStreamHandler(outputStream, errorStream));
 
-        try {
+            // 设置超时防止阻塞（例如5秒）
+            ExecuteWatchdog watchdog = new ExecuteWatchdog(5000);
+            executor.setWatchdog(watchdog);
+
             int exitValue = executor.execute(cmdLine);
-            if(exitValue != 0) {
-                throw new IOException("命令执行失败: " + errorStream.toString());
+            if (exitValue != 0) {
+                throw new IOException("Exit code " + exitValue + ": " + errorStream.toString());
             }
             return outputStream.toString();
-        } catch (ExecuteException e) {
-            throw new IOException("执行异常: " + errorStream.toString(), e);
         }
     }
 }

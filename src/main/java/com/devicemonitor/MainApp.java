@@ -26,7 +26,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(root, 400, 300);
         primaryStage.setTitle("手机设备监控器");
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.show();
     }
 

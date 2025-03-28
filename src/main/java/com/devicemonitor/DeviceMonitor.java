@@ -1,7 +1,9 @@
 package com.devicemonitor;
 
 import com.devicemonitor.utils.ADBUtil;
+import javafx.application.Platform;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +20,7 @@ public class DeviceMonitor {
     private DeviceStatusListener listener;
 
     public interface DeviceStatusListener {
-        void onStatusUpdate(boolean isConnected, String cpuFrequency);
+        void onStatusUpdate(boolean isConnected, List<String> cpuFrequencies);
     }
 
     public DeviceMonitor() {
@@ -27,7 +29,7 @@ public class DeviceMonitor {
 
     public void startMonitoring(DeviceStatusListener listener) {
         this.listener = listener;
-        scheduler.scheduleAtFixedRate(this::checkDeviceStatus, 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::checkDeviceStatus, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     public void stopMonitoring() {
@@ -44,10 +46,15 @@ public class DeviceMonitor {
     }
 
     private void checkDeviceStatus() {
-        boolean isConnected = ADBUtil.isDeviceConnected();
-        String cpuFrequency = ADBUtil.getCPUFrequency();
-        if (listener != null) {
-            listener.onStatusUpdate(isConnected, cpuFrequency);
+        try {
+            boolean isConnected = ADBUtil.isDeviceConnected();
+            List<String> cpuFrequencies = ADBUtil.getCPUFrequencies();
+
+            if (listener != null) {
+                listener.onStatusUpdate(isConnected, cpuFrequencies);
+            }
+        } catch (Exception e) {
+
         }
     }
 }
