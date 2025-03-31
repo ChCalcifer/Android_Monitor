@@ -23,8 +23,8 @@ public class MainApp extends Application {
         Parent root = loader.load();
         controller = loader.getController();
 
-        Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("手机设备监控器");
+        Scene scene = new Scene(root, 950, 600);
+        primaryStage.setTitle("Android Monitor V1.0");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);
         primaryStage.show();

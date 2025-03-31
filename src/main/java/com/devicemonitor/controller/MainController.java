@@ -1,9 +1,6 @@
 package com.devicemonitor.controller;
 
 import com.devicemonitor.DeviceMonitor;
-import com.devicemonitor.utils.ADBUtil;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -77,23 +74,6 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
     @Override
     public void onStatusUpdate(boolean isConnected, List<String> cpuFrequencies) {
-//        Platform.runLater(() -> {
-//            // 更新设备状态灯
-//            drawStatusLight(isConnected);
-//
-//            // 更新频率显示
-//            for (int i = 0; i < frequencyLabels.size(); i++) {
-//                Label label = frequencyLabels.get(i);
-//                if (i < cpuFrequencies.size()) {
-//                    label.setText(cpuFrequencies.get(i));
-//                    label.setVisible(true);
-//                    label.setManaged(true);
-//                } else {
-//                    label.setVisible(false);
-//                    label.setManaged(false);
-//                }
-//            }
-//        });
         Platform.runLater(() -> {
             // 更新设备状态灯
             drawStatusLight(isConnected);
