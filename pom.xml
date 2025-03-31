@@ -14,7 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <javafx.version>17.0.14</javafx.version> <!-- 修正版本号 -->
-        <javafx.home>D:\Download\Google\tools\openjfx-17.0.14_windows-x64_bin-sdk\javafx-sdk-17.0.14</javafx.home>
+        <javafx.home>D:\Download\Google\tools\openjfx-17.0.14_windows-x64_bin-sdk\javafx-sdk-17.0.14\lib</javafx.home>
     </properties>
 
     <dependencies>
