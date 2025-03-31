@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Glow;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -48,25 +49,25 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // 设置Canvas固定大小
+        statusCanvas.setWidth(40);
+        statusCanvas.setHeight(40);
+
+        // 初始化横向标签容器
         initFrequencyLabels();
-
         updateStatusMessage(false);
-
-        // 初始化设备监控器
         deviceMonitor = new DeviceMonitor();
-        deviceMonitor.startMonitoring(this); // 关键修复点
+        deviceMonitor.startMonitoring(this);
     }
 
     private void initFrequencyLabels() {
         cpuFrequenciesBox.getChildren().clear();
-        frequencyLabels.clear();
+        cpuFrequenciesBox.setSpacing(2); // 横向间距
 
-        // 动态创建标签（最多16核）
         for (int i = 0; i < 16; i++) {
             Label label = new Label();
-            label.getStyleClass().add("cpu-frequency-label");
+            label.setStyle("-fx-font-family: monospace;"); // 简化样式
             label.setVisible(false);
-            label.setManaged(false); // 优化布局计算
             frequencyLabels.add(label);
         }
         cpuFrequenciesBox.getChildren().addAll(frequencyLabels);
@@ -77,6 +78,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         Platform.runLater(() -> {
             // 更新设备状态灯
             drawStatusLight(isConnected);
+
+            updateStatusMessage(isConnected);
 
             // 优化：减少频繁的可见性和管理性切换
             for (int i = 0; i < frequencyLabels.size(); i++) {
@@ -109,18 +112,10 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         GraphicsContext gc = statusCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, statusCanvas.getWidth(), statusCanvas.getHeight());
 
-        // 绘制外圈
-        gc.setStroke(Color.LIGHTGRAY);
-        gc.setLineWidth(3);
-        gc.strokeOval(10, 10, 80, 80);
-
         // 绘制状态灯
         gc.setFill(isConnected ? Color.valueOf("#2ecc71") : Color.valueOf("#e74c3c"));
-        gc.fillOval(15, 15, 70, 70);
+        gc.fillOval(30, 30, 10, 10);
 
-        // 添加光泽效果
-        gc.setFill(Color.rgb(255, 255, 255, 0.3));
-        gc.fillArc(20, 20, 60, 60, 30, 120, ArcType.ROUND);
     }
 
 
