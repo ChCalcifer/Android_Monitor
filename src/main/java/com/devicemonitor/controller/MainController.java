@@ -51,7 +51,7 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // // 设置Canvas固定大小
-        statusCanvas.setWidth(40);
+        statusCanvas.setWidth(38);
         statusCanvas.setHeight(40);
 
         // 初始化横向标签容器

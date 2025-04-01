@@ -7,20 +7,20 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="600"
-            prefWidth="950"
-            xmlns="http://javafx.com/javafx/17.0.14"
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.14"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.devicemonitor.controller.MainController">
+            fx:controller="com.devicemonitor.controller.MainController"
+            stylesheets="@style.css"
+            fx:id="root">
     <!-- 中间CPU频率横向显示 -->
     <ScrollPane fitToWidth="true">
-        <AnchorPane prefHeight="800" prefWidth="1200">
-            <HBox alignment="CENTER" prefHeight="38" prefWidth="38" style="-fx-border-color: red; -fx-border-width: 1;" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
+        <AnchorPane>
+            <HBox alignment="CENTER" style="-fx-border-color: red; -fx-border-width: 1;" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
                 <Canvas fx:id="statusCanvas" />
             </HBox>
 
-            <HBox fx:id="cpuFrequenciesBox" alignment="CENTER" layoutY="43" prefHeight="50" prefWidth="1000" style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="42">
-                <Label prefHeight="101.0" prefWidth="934.0" text="CPU Frequencies" />
+            <HBox fx:id="cpuFrequenciesBox" VBox.vgrow="ALWAYS" alignment="CENTER" layoutY="43" prefHeight="90" style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="42">
+                <Label text="CPU Frequencies" />
             </HBox>
 
             <VBox alignment="CENTER" layoutX="41" prefHeight="42" style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">

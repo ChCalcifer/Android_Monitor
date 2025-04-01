@@ -1,0 +1,32 @@
+/* style.css */
+
+/* 为 AnchorPane 设置背景颜色 */
+AnchorPane {
+    -fx-background-color: #f0f0f0;
+}
+
+/* 为 HBox 添加边框和内边距 */
+#cpuFrequenciesBox {
+    -fx-background-color: yellow;
+    -fx-border-color: #d00606;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+}
+
+/* 为 Label 设置文本颜色和字体 */
+Label {
+    -fx-text-fill: #333;
+    -fx-font-size: 14px;
+}
+
+/* 为特定的 Label 设置字体粗细 */
+#statusLabel {
+    -fx-font-weight: bold;
+    -fx-text-fill: #0c0ccc;
+}
+
+/* 为特定的 VBox 设置背景色 */
+VBox {
+    -fx-background-color: #279a37;
+    -fx-padding: 5;
+}

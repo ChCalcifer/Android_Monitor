@@ -6,6 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import static com.devicemonitor.utils.AdbUtil.shutdownExecutor;
+
 /**
  * Author: CYC
  * Time: 2025/3/27 16:13:11
@@ -37,7 +40,6 @@ public class MainApp extends Application {
             controller.shutdown();
         }
         super.stop();
-        AdbUtil.shutdownExecutor();
     }
 
     public static void main(String[] args) {
