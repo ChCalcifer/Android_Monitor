@@ -1,10 +1,10 @@
-package com.devicemonitor;
+package com.devicemonitor.controller;
 
-import com.devicemonitor.controller.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 /**
  * Author: CYC
@@ -19,7 +19,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/devicemonitor/main-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main-view.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
 

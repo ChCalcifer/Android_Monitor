@@ -1,6 +1,7 @@
 package com.devicemonitor.controller;
 
 import com.devicemonitor.DeviceMonitor;
+import com.devicemonitor.utils.ADBUtil;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -37,9 +38,17 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     @FXML
     private Label cpuFrequencyLabel;
     @FXML
-    private VBox cpuFrequenciesBox;
+    private HBox cpuFrequenciesBox;
     @FXML
     private Label statusLabel;
+    @FXML
+    private Label phoneModelLabel;
+    @FXML
+    private Label softwareVersionLabel;
+    @FXML
+    private Label androidVersionLabel;
+    @FXML
+    private Label batteryTempLabel;
 
     private DeviceMonitor deviceMonitor;
 
@@ -58,6 +67,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         updateStatusMessage(false);
         deviceMonitor = new DeviceMonitor();
         deviceMonitor.startMonitoring(this);
+
+        updateDeviceInfo();
     }
 
     private void initFrequencyLabels() {
@@ -73,6 +84,14 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         cpuFrequenciesBox.getChildren().addAll(frequencyLabels);
     }
 
+    public void updateDeviceInfo() {
+        // 调用 ADBUtil 中的 displayDeviceModel 方法
+        ADBUtil.getDeviceModel(phoneModelLabel);
+        ADBUtil.getDeviceSoftwareVersion(softwareVersionLabel);
+        ADBUtil.getAndroidVersion(androidVersionLabel);
+        ADBUtil.getBatteryTemperature(batteryTempLabel);
+    }
+
     @Override
     public void onStatusUpdate(boolean isConnected, List<String> cpuFrequencies) {
         Platform.runLater(() -> {
@@ -80,6 +99,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
             drawStatusLight(isConnected);
 
             updateStatusMessage(isConnected);
+
+            updateDeviceInfo();
 
             // 优化：减少频繁的可见性和管理性切换
             for (int i = 0; i < frequencyLabels.size(); i++) {
@@ -114,7 +135,7 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
         // 绘制状态灯
         gc.setFill(isConnected ? Color.valueOf("#2ecc71") : Color.valueOf("#e74c3c"));
-        gc.fillOval(30, 30, 10, 10);
+        gc.fillOval(0, 1, 38, 38);
 
     }
 
@@ -122,7 +143,7 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     private void updateStatusMessage(boolean isConnected) {
         if (statusLabel == null) return; // 安全防护
 
-        String status = isConnected ? "设备已连接 ✓" : "设备未连接 ×";
+        String status = isConnected ? "已连接 ✓" : "未连接 ×";
         String color = isConnected ? "#2ecc71" : "#e74c3c";
 
         statusLabel.setText(status);
