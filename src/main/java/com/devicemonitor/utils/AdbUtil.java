@@ -209,6 +209,7 @@ public class AdbUtil {
                 throw new IOException("Exit code " + exitValue + ": " + errorStream.toString(StandardCharsets.UTF_8));
             }
             return outputStream.toString(StandardCharsets.UTF_8);
+
         }
     }
 
