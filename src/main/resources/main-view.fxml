@@ -7,7 +7,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="600" prefWidth="950" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.MainController">
+<AnchorPane prefHeight="600"
+            prefWidth="950"
+            xmlns="http://javafx.com/javafx/17.0.14"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.devicemonitor.controller.MainController">
     <!-- 中间CPU频率横向显示 -->
     <ScrollPane fitToWidth="true">
         <AnchorPane prefHeight="800" prefWidth="1200">
@@ -48,7 +52,7 @@
             </VBox>
 
             <VBox alignment="CENTER" layoutX="430" layoutY="21" prefHeight="21" style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="diaplaySizeLabel" text="5000*2000" />
+                <Label fx:id="displaySizeLabel" text="5000*2000" />
             </VBox>
 
             <VBox alignment="CENTER" layoutX="580"  prefHeight="21" style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">

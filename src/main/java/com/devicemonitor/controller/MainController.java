@@ -1,28 +1,21 @@
 package com.devicemonitor.controller;
 
 import com.devicemonitor.DeviceMonitor;
-import com.devicemonitor.utils.ADBUtil;
-import javafx.animation.Timeline;
+import com.devicemonitor.utils.AdbUtil;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Glow;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext; // 新增这个导入
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
-import javafx.util.Duration;
 
 /**
  * Author: CYC
@@ -30,13 +23,12 @@ import javafx.util.Duration;
  * Description:
  * Branch:
  * Version: 1.0
+ * @author uu
  */
 
 public class MainController implements Initializable, DeviceMonitor.DeviceStatusListener {
     @FXML
     private Canvas statusCanvas;
-    @FXML
-    private Label cpuFrequencyLabel;
     @FXML
     private HBox cpuFrequenciesBox;
     @FXML
@@ -52,13 +44,13 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
     private DeviceMonitor deviceMonitor;
 
-    private Timeline updateTimeline;
-
     private final ObservableList<Label> frequencyLabels = FXCollections.observableArrayList();
+
+    private static final int NUM_OF_CORE = 16;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // 设置Canvas固定大小
+        // // 设置Canvas固定大小
         statusCanvas.setWidth(40);
         statusCanvas.setHeight(40);
 
@@ -72,12 +64,14 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     }
 
     private void initFrequencyLabels() {
+        // 横向间距
         cpuFrequenciesBox.getChildren().clear();
-        cpuFrequenciesBox.setSpacing(2); // 横向间距
+        cpuFrequenciesBox.setSpacing(2);
 
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < NUM_OF_CORE; i++) {
             Label label = new Label();
-            label.setStyle("-fx-font-family: monospace;"); // 简化样式
+            // 简化样式
+            label.setStyle("-fx-font-family: monospace;");
             label.setVisible(false);
             frequencyLabels.add(label);
         }
@@ -86,10 +80,10 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
     public void updateDeviceInfo() {
         // 调用 ADBUtil 中的 displayDeviceModel 方法
-        ADBUtil.getDeviceModel(phoneModelLabel);
-        ADBUtil.getDeviceSoftwareVersion(softwareVersionLabel);
-        ADBUtil.getAndroidVersion(androidVersionLabel);
-        ADBUtil.getBatteryTemperature(batteryTempLabel);
+        AdbUtil.getDeviceModel(phoneModelLabel);
+        AdbUtil.getDeviceSoftwareVersion(softwareVersionLabel);
+        AdbUtil.getAndroidVersion(androidVersionLabel);
+        AdbUtil.getBatteryTemperature(batteryTempLabel);
     }
 
     @Override
@@ -141,7 +135,10 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
 
     private void updateStatusMessage(boolean isConnected) {
-        if (statusLabel == null) return; // 安全防护
+        // 安全防护
+        if(statusLabel == null){
+            return;
+        }
 
         String status = isConnected ? "已连接 ✓" : "未连接 ×";
         String color = isConnected ? "#2ecc71" : "#e74c3c";

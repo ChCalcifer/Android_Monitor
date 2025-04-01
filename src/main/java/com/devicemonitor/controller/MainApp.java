@@ -1,10 +1,10 @@
 package com.devicemonitor.controller;
 
+import com.devicemonitor.utils.AdbUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 /**
  * Author: CYC
@@ -12,6 +12,7 @@ import javafx.stage.Stage;
  * Description:
  * Branch:
  * Version: 1.0
+ * @author uu
  */
 
 public class MainApp extends Application {
@@ -36,6 +37,7 @@ public class MainApp extends Application {
             controller.shutdown();
         }
         super.stop();
+        AdbUtil.shutdownExecutor();
     }
 
     public static void main(String[] args) {
