@@ -66,8 +66,10 @@ public class AdbUtil {
     public static boolean isDeviceConnected() {
         try {
             String output = executeCommand(ADB_PATH + " devices");
-            return output.contains("\tdevice");
+            // 检查输出中是否包含设备 ID，判断设备是否连接
+            return output.contains("\tdevice") && !output.contains("List of devices attached");
         } catch (Exception e) {
+            // 捕获异常时返回 false，表示设备未连接
             return false;
         }
     }
@@ -148,7 +150,7 @@ public class AdbUtil {
                 });
 
             } catch (Exception e) {
-                Platform.runLater(() -> fpsLabel.setText("error"));
+                Platform.runLater(() -> fpsLabel.setText("需Root"));
                 e.printStackTrace();
             }
         });
