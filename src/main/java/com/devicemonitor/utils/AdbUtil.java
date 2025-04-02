@@ -34,11 +34,18 @@ public class AdbUtil {
      * 空格。
      */
     private static final Pattern CPU_FREQUENCY_PATTERN = Pattern.compile("\\d+");
-
+    /**
+     * 定位batteryTemp。
+     */
+    private static final Pattern BATTERY_TEMP_PATTERN = Pattern.compile("temperature:\\s*(\\d+)");
+    /**
+     * 定位currentFps。
+     */
+    private static final Pattern FPS_PATTERN = Pattern.compile("^\\s*\\d+\\s+\\S+\\s+\\S+\\s+(-?\\d+)\\b");
     /**
      * 定时线程池。
      */
-    private static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(5);
+    private static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(10);
 
     /**
      * 异步线程池。
@@ -47,7 +54,7 @@ public class AdbUtil {
             // 核心线程数
             10,
             // 最大线程数
-            10,
+            50,
             // 线程空闲时的最大存活时间（秒）
             60,
             // 时间单位
@@ -121,6 +128,66 @@ public class AdbUtil {
         });
     }
 
+    public static void getFrameRate(Label fpsLabel) {
+        executorService.submit(() -> {
+            try {
+                // 添加超时和错误流处理
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/kernel/fpsgo/fstb/fpsgo_status 2>/dev/null\"");
+                if (output == null) {
+                    Platform.runLater(() -> fpsLabel.setText("no data"));
+                    return;
+                }
+
+                String frameRate = parseFrameRate(output);
+                Platform.runLater(() -> {
+                    if (isValidFPS(frameRate)) {
+                        fpsLabel.setText(frameRate + " FPS");
+                    } else {
+                        fpsLabel.setText("0");
+                    }
+                });
+
+            } catch (Exception e) {
+                Platform.runLater(() -> fpsLabel.setText("error"));
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private static String parseFrameRate(String output) {
+        return output.lines()
+                .skip(1) // 跳过标题行
+                .map(String::trim)
+                .filter(line -> !line.isEmpty())
+                .map(FPS_PATTERN::matcher)
+                .filter(Matcher::find)
+                .map(m -> m.group(1))
+                .filter(fps -> !fps.equals("0") && !fps.equals("-1"))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static boolean isValidFPS(String fps) {
+        return fps != null && !fps.isEmpty() && !fps.equals("0") && !fps.equals("-1");
+    }
+
+    public static void getActivity(Label activityLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取设备型号
+                String output = executeCommand(ADB_PATH + " shell \"dumpsys activity top | grep ACTIVITY | tail -n 1\"");
+                if (output != null && !output.isEmpty()) {
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> activityLabel.setText("CurrentActivity: " + output.trim()));
+                } else {
+                    Platform.runLater(() -> activityLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> activityLabel.setText("None"));
+            }
+        });
+    }
+
     public static List<String> getCpuFrequencies() {
         try {
             // 增加超时和错误处理
@@ -155,19 +222,18 @@ public class AdbUtil {
                     }
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> batteryTemperatureLabel.setText("Error"));
+                Platform.runLater(() -> batteryTemperatureLabel.setText("error"));
             }
             // 从0秒开始，每20秒执行一次
         }, 0, 20, TimeUnit.SECONDS);
     }
-
 
     /**
      * 从adb输出中提取温度。
      */
     private static String parseBatteryTemperature(String output) {
         // 正则表达式匹配温度
-        Matcher matcher = CPU_FREQUENCY_PATTERN.matcher(output);
+        Matcher matcher = BATTERY_TEMP_PATTERN.matcher(output);
 
         if (matcher.find()) {
             // 获取温度值并转换为摄氏度

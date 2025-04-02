@@ -41,6 +41,10 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     private Label androidVersionLabel;
     @FXML
     private Label batteryTempLabel;
+    @FXML
+    private Label activityLabel;
+    @FXML
+    private Label fpsLabel;
 
     private DeviceMonitor deviceMonitor;
 
@@ -84,6 +88,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         AdbUtil.getDeviceSoftwareVersion(softwareVersionLabel);
         AdbUtil.getAndroidVersion(androidVersionLabel);
         AdbUtil.getBatteryTemperature(batteryTempLabel);
+        AdbUtil.getActivity(activityLabel);
+        AdbUtil.getFrameRate(fpsLabel);
     }
 
     @Override
