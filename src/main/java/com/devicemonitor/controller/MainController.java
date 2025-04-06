@@ -32,19 +32,22 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     @FXML
     private HBox cpuFrequenciesBox;
     @FXML
-    private Label statusLabel;
-    @FXML
-    private Label phoneModelLabel;
-    @FXML
-    private Label softwareVersionLabel;
-    @FXML
-    private Label androidVersionLabel;
-    @FXML
-    private Label batteryTempLabel;
-    @FXML
-    private Label activityLabel;
-    @FXML
-    private Label fpsLabel;
+    private Label statusLabel,
+            phoneModelLabel,
+            softwareVersionLabel,
+            androidVersionLabel,
+            batteryTempLabel,
+            activityLabel,
+            fpsLabel,
+            displaySizeLabel,
+            socTempLabel,
+            cpuSmallCoreTempLabel,
+            cpuBigCoreTempLabel,
+            modemTempLabel,
+            pmicTempLabel,
+            cameraTempLabel,
+            gpuTempLabel,
+            resultLabel;
 
     private DeviceMonitor deviceMonitor;
 
@@ -90,6 +93,19 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         AdbUtil.getBatteryTemperature(batteryTempLabel);
         AdbUtil.getActivity(activityLabel);
         AdbUtil.getFrameRate(fpsLabel);
+        AdbUtil.getDisplaySize(displaySizeLabel);
+        AdbUtil.getSocTemp(socTempLabel);
+        AdbUtil.getSmCoreTemp(cpuSmallCoreTempLabel);
+        AdbUtil.getBigCoreTemp(cpuBigCoreTempLabel);
+        AdbUtil.getModemTemp(modemTempLabel);
+        AdbUtil.getPMICTemp(pmicTempLabel);
+        AdbUtil.getCameraTemp(cameraTempLabel);
+        AdbUtil.getGpuTemp(gpuTempLabel);
+    }
+
+    @FXML
+    private void handleExecuteCommand() {
+        AdbUtil.setScreenBrightness(102, resultLabel); // 102是默认亮度值
     }
 
     @Override
@@ -138,7 +154,6 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         gc.fillOval(0, 1, 38, 38);
 
     }
-
 
     private void updateStatusMessage(boolean isConnected) {
         // 安全防护

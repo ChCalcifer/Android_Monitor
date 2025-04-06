@@ -1,6 +1,7 @@
 package com.devicemonitor.utils;
 
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.apache.commons.exec.*;
 
@@ -29,7 +30,6 @@ public class AdbUtil {
      * ADB 命令的路径。
      */
     private static final String ADB_PATH = "adb";
-
     /**
      * 空格。
      */
@@ -38,6 +38,10 @@ public class AdbUtil {
      * 定位batteryTemp。
      */
     private static final Pattern BATTERY_TEMP_PATTERN = Pattern.compile("temperature:\\s*(\\d+)");
+    /**
+     * 定位屏幕尺寸。
+     */
+    private static final Pattern DISPLAY_SIZE_PATTERN = Pattern.compile("(\\d+)x(\\d+)");
     /**
      * 定位currentFps。
      */
@@ -63,11 +67,14 @@ public class AdbUtil {
             new LinkedBlockingQueue<>()
     );
 
+    /**
+     * 设备连接 获取并更新设备连接状态。
+     */
     public static boolean isDeviceConnected() {
         try {
             String output = executeCommand(ADB_PATH + " devices");
             // 检查输出中是否包含设备 ID，判断设备是否连接
-            return output.contains("\tdevice") && !output.contains("List of devices attached");
+            return output.contains("\tdevice");
         } catch (Exception e) {
             // 捕获异常时返回 false，表示设备未连接
             return false;
@@ -76,7 +83,7 @@ public class AdbUtil {
 
 
     /**
-     * 获取设备型号并显示。
+     * 设备型号 获取设备型号并显示。
      */
     public static void getDeviceModel(Label phoneModelLabel) {
         // 使用线程池来执行任务
@@ -96,6 +103,9 @@ public class AdbUtil {
         });
     }
 
+    /**
+     * 软件版本 获取软件版本。
+     */
     public static void getDeviceSoftwareVersion(Label softwareVersionLabel) {
         executorService.submit(() -> {
             try {
@@ -113,6 +123,9 @@ public class AdbUtil {
         });
     }
 
+    /**
+     * 安卓版本 获取安卓版本。
+     */
     public static void getAndroidVersion(Label androidVersionLabel) {
         executorService.submit(() -> {
             try {
@@ -130,11 +143,21 @@ public class AdbUtil {
         });
     }
 
+
+
+    /**
+     * FPS 获取并更新帧数。
+     */
     public static void getFrameRate(Label fpsLabel) {
         executorService.submit(() -> {
             try {
+                if (!isDeviceConnected()){
+                    Platform.runLater(() -> fpsLabel.setText("设备未连接"));
+                    return;
+                }
+
                 // 添加超时和错误流处理
-                String output = executeCommand(ADB_PATH + " shell \"cat /sys/kernel/fpsgo/fstb/fpsgo_status 2>/dev/null\"");
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/kernel/fpsgo/fstb/fpsgo_status\"");
                 if (output == null) {
                     Platform.runLater(() -> fpsLabel.setText("no data"));
                     return;
@@ -145,7 +168,7 @@ public class AdbUtil {
                     if (isValidFPS(frameRate)) {
                         fpsLabel.setText(frameRate + " FPS");
                     } else {
-                        fpsLabel.setText("0");
+                        fpsLabel.setText("0 FPS");
                     }
                 });
 
@@ -156,6 +179,9 @@ public class AdbUtil {
         });
     }
 
+    /**
+     * FPS adb中获取FPS帧数。
+     */
     private static String parseFrameRate(String output) {
         return output.lines()
                 .skip(1) // 跳过标题行
@@ -164,15 +190,23 @@ public class AdbUtil {
                 .map(FPS_PATTERN::matcher)
                 .filter(Matcher::find)
                 .map(m -> m.group(1))
-                .filter(fps -> !fps.equals("0") && !fps.equals("-1"))
+                .filter(fps -> !fps.equals("-1"))
                 .findFirst()
                 .orElse(null);
     }
 
+    /**
+     * FPS。
+     */
     private static boolean isValidFPS(String fps) {
-        return fps != null && !fps.isEmpty() && !fps.equals("0") && !fps.equals("-1");
+        return fps != null && !fps.isEmpty() && !fps.equals("-1");
     }
 
+
+
+    /**
+     * Activity 获取并更新Activity。
+     */
     public static void getActivity(Label activityLabel) {
         executorService.submit(() -> {
             try {
@@ -190,20 +224,178 @@ public class AdbUtil {
         });
     }
 
-    public static List<String> getCpuFrequencies() {
-        try {
-            // 增加超时和错误处理
-            String output = executeCommand(ADB_PATH + " shell \"cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2> /dev/null\"");
-            List<String> result = parseCpuFrequencies(output);
-            return result.isEmpty() ?
-                    Collections.singletonList("No frequency data") : result;
-        } catch (Exception e) {
-            return Collections.singletonList("ADB Error: " + e.getMessage());
-        }
+
+    /**
+     * Soc温度 获取并更新Soc温度。
+     */
+    public static void getSocTemp(Label activityLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取soc温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone0/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> activityLabel.setText("Soc: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> activityLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> activityLabel.setText("None"));
+            }
+        });
     }
 
     /**
-     * 获取并更新电池温度。
+     * 小核温度 获取并更新小核温度。
+     */
+    public static void getSmCoreTemp(Label cpuSmallCoreTempLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取小核温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone1/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> cpuSmallCoreTempLabel.setText("SmallCore: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> cpuSmallCoreTempLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> cpuSmallCoreTempLabel.setText("None"));
+            }
+        });
+    }
+
+    /**
+     * 大核温度 获取并更新大核温度。
+     */
+    public static void getBigCoreTemp(Label cpuBigCoreTempLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取大核温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone5/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> cpuBigCoreTempLabel.setText("BigCore: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> cpuBigCoreTempLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> cpuBigCoreTempLabel.setText("None"));
+            }
+        });
+    }
+
+    /**
+     * modem温度 获取并更新modem温度。
+     */
+    public static void getModemTemp(Label modemTempLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取modem温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone13/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> modemTempLabel.setText("modem: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> modemTempLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> modemTempLabel.setText("None"));
+            }
+        });
+    }
+
+    /**
+     * PMIC温度 获取并更新PMIC温度。
+     */
+    public static void getPMICTemp(Label pmicTempLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取PMIC温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone16/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> pmicTempLabel.setText("PMIC: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> pmicTempLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> pmicTempLabel.setText("None"));
+            }
+        });
+    }
+
+    /**
+     * PMIC温度 获取并更新PMIC温度。
+     */
+    public static void getCameraTemp(Label cameraTempLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取Camera温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone21/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> cameraTempLabel.setText("Camera: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> cameraTempLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> cameraTempLabel.setText("None"));
+            }
+        });
+    }
+
+    /**
+     * PMIC温度 获取并更新PMIC温度。
+     */
+    public static void getGpuTemp(Label cameraTempLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取GPU温度
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/class/thermal/thermal_zone10/temp\"");
+                if (output != null && !output.isEmpty()) {
+                    // 将五位数转换为温度（千分之一度 -> 度）
+                    int temp = Integer.parseInt(output.trim());
+                    double temperature = temp / 1000.0;
+
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> cameraTempLabel.setText("GPU: " + String.format("%.2f", temperature) + "°C"));
+                } else {
+                    Platform.runLater(() -> cameraTempLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> cameraTempLabel.setText("None"));
+            }
+        });
+    }
+
+
+    /**
+     * 电池温度 获取并更新电池温度。
      */
     public static void getBatteryTemperature(Label batteryTemperatureLabel) {
         // 定时任务，初始延迟 0，周期 20 秒
@@ -231,7 +423,7 @@ public class AdbUtil {
     }
 
     /**
-     * 从adb输出中提取温度。
+     * 电池温度 从adb输出中提取温度。
      */
     private static String parseBatteryTemperature(String output) {
         // 正则表达式匹配温度
@@ -246,6 +438,26 @@ public class AdbUtil {
         return null;
     }
 
+
+
+    /**
+     * CPU频率 获取并更新cpu频率。
+     */
+    public static List<String> getCpuFrequencies() {
+        try {
+            // 增加超时和错误处理
+            String output = executeCommand(ADB_PATH + " shell \"cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2> /dev/null\"");
+            List<String> result = parseCpuFrequencies(output);
+            return result.isEmpty() ?
+                    Collections.singletonList("No frequency data") : result;
+        } catch (Exception e) {
+            return Collections.singletonList("ADB Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * CPU频率 从adb中提取cpu频率。
+     */
     private static List<String> parseCpuFrequencies(String output) {
         List<String> frequencies = new ArrayList<>();
         Matcher matcher = CPU_FREQUENCY_PATTERN.matcher(output);
@@ -259,6 +471,85 @@ public class AdbUtil {
         return frequencies.isEmpty() ? Collections.singletonList("N/A") : frequencies;
     }
 
+
+
+    /**
+     * 屏幕尺寸 获取屏幕尺寸。
+     */
+    public static void getDisplaySize(Label displaySizeLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取设备型号
+                String output = executeCommand(ADB_PATH + " shell wm size");
+
+                String deviceDisplaySize = parseDisplaySize(output);
+
+                Platform.runLater(() -> {
+                    if (deviceDisplaySize != null) {
+                        displaySizeLabel.setText(deviceDisplaySize);
+                    } else {
+                        displaySizeLabel.setText("Unknown");
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> displaySizeLabel.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 屏幕尺寸 从adb输出中提取屏幕尺寸。
+     */
+    private static String parseDisplaySize(String output) {
+        // 正则表达式匹配温度
+        Matcher matcher = DISPLAY_SIZE_PATTERN.matcher(output);
+
+        // 检查是否匹配成功
+        if (matcher.find()) {
+            // 返回匹配到的屏幕尺寸
+            return matcher.group(0);
+        } else {
+            // 如果没有匹配到，返回null或"Unknown"
+            return null;
+        }
+
+    }
+
+    /**
+     * 默认亮度 将屏幕亮度设置为默认。
+     */
+    public static void setScreenBrightness(int value, Label resultLabel) {
+        executorService.submit(() -> {
+            try {
+                if (!isDeviceConnected()) {
+                    Platform.runLater(() -> resultLabel.setText("设备未连接"));
+                    return;
+                }
+
+                String command = ADB_PATH + " shell settings put system screen_brightness " + value;
+                String output = executeCommand(command);
+
+                Platform.runLater(() -> {
+                    if (output.contains("Exception") || output.contains("error")) {
+                        resultLabel.setText("设置失败: 需要ADB权限");
+                    } else {
+                        resultLabel.setText("亮度已设置为默认");
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> resultLabel.setText("错误: " + e.getMessage()));
+            }
+        });
+    }
+
+
+
+
+
+
+    /**
+     * 执行线程。
+     */
     private static String executeCommand(String command) throws IOException {
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -274,12 +565,14 @@ public class AdbUtil {
 
             int exitValue = executor.execute(cmdLine);
             if (exitValue != 0) {
-                throw new IOException("Exit code " + exitValue + ": " + errorStream.toString(StandardCharsets.UTF_8));
+                String errorMessage = "Exit code " + exitValue + ": " + errorStream.toString(StandardCharsets.UTF_8);
+                throw new IOException(errorMessage); // 抛出异常
             }
             return outputStream.toString(StandardCharsets.UTF_8);
 
         }
     }
+
 
 
     /**
