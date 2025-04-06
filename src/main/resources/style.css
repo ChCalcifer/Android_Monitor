@@ -1,32 +1,59 @@
-/* style.css */
-
-/* 为 AnchorPane 设置背景颜色 */
-AnchorPane {
-    -fx-background-color: #f0f0f0;
+/* 确保所有 Tab 的文本颜色为黑色 */
+.tab-text {
+    -fx-text-fill: black; /* 所有 Tab 的文本颜色 */
 }
 
-/* 为 HBox 添加边框和内边距 */
-#cpuFrequenciesBox {
-    -fx-background-color: yellow;
-    -fx-border-color: #d00606;
-    -fx-border-width: 1;
-    -fx-padding: 10;
+/* 隐藏未选中的 Tab */
+.tab {
+    -fx-opacity: 0; /* 设置未选中的 Tab 透明度为 0.2 */
 }
 
-/* 为 Label 设置文本颜色和字体 */
-Label {
-    -fx-text-fill: #333;
-    -fx-font-size: 14px;
+/* 设置选中的 Tab 样式 */
+.tab:selected {
+    -fx-background-color: white;   /* 选中的 Tab 背景颜色为白色 */
+    -fx-text-fill: black;          /* 选中的 Tab 文本颜色为黑色 */
+    -fx-opacity: 1;                /* 恢复选中的 Tab 透明度为 1 */
 }
 
-/* 为特定的 Label 设置字体粗细 */
-#statusLabel {
-    -fx-font-weight: bold;
-    -fx-text-fill: #0c0ccc;
+/* 如果你想要选中的 Tab 文字更加突出，可以增加样式，比如加粗 */
+.tab:selected .tab-text {
+    -fx-font-weight: bold;         /* 选中的 Tab 字体加粗 */
 }
 
-/* 为特定的 VBox 设置背景色 */
-VBox {
-    -fx-background-color: #279a37;
-    -fx-padding: 5;
+/* 设置 ListView 背景颜色 */
+#menuListView {
+    -fx-background-color: #f4f4f4; /* 浅灰色背景 */
+    -fx-border-color: #ccc; /* 边框颜色 */
+
+
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1); /* 轻微阴影效果 */
+}
+
+/* 设置 ListView 中项的样式 */
+#menuListView .list-cell {
+    -fx-background-color: #ffffff; /* 白色背景 */
+    -fx-text-fill: #333333; /* 黑色文本 */
+    -fx-font-size: 14px; /* 字体大小 */
+
+    -fx-border-color: transparent; /* 去除项的边框 */
+
+    -fx-background-radius: 4px; /* 圆角 */
+}
+
+/* 设置鼠标悬停时项的样式 */
+#menuListView .list-cell:hover {
+    -fx-background-color: #e1e1e1; /* 悬停时背景颜色 */
+    -fx-cursor: hand; /* 鼠标指针变成手形 */
+}
+
+/* 设置选中项的样式 */
+#menuListView .list-cell:filled:selected {
+    -fx-background-color: #0078d4; /* 选中项的背景色 */
+    -fx-text-fill: white; /* 选中项文本颜色 */
+}
+
+/* 设置 ListView 中的条目间距 */
+#menuListView .list-cell {
+    -fx-spacing: 10px; /* 条目之间的间隔 */
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<BorderPane
+            fx:controller="com.devicemonitor.controller.MainController"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17.0.14"
+            stylesheets="@style.css"
+            maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <left>
+        <VBox fx:id="leftRootVBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <ListView fx:id="menuListView" onMouseClicked="#handleMenuClick" prefHeight="400.0" prefWidth="200.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="设备信息" />
+                            <String fx:value="CPU" />
+                            <String fx:value="GPU" />
+                            <String fx:value="Display" />
+                        </FXCollections>
+                    </items>
+                </ListView>
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <TabPane fx:id="tabPane" focusTraversable="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" rotateGraphic="true" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="TOP_LEFT">
+            <tabs>
+                <Tab text="设备信息" fx:id="deviceTab">
+                    <content>
+                        <!-- Tab content for Device Info -->
+                    </content>
+                </Tab>
+                <Tab text="CPU" fx:id="cpuTab">
+                    <content>
+                        <!-- Tab content for CPU -->
+                    </content>
+                </Tab>
+                <Tab text="GPU" fx:id="gpuTab">
+                    <content>
+                        <!-- Tab content for GPU -->
+                    </content>
+                </Tab>
+                <Tab text="Display" fx:id="displayTab">
+                    <content>
+                        <!-- Tab content for Display -->
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <top>
+        <Pane fx:id="topRootPane" prefHeight="48.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+    </top>
+</BorderPane>

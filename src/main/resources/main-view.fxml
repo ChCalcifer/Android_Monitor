@@ -1,184 +1,173 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<!--<?import javafx.scene.canvas.Canvas?>-->
+<!--<?import javafx.scene.control.Label?>-->
+<!--<?import javafx.scene.layout.AnchorPane?>-->
+<!--<?import javafx.scene.layout.HBox?>-->
+<!--<?import javafx.scene.layout.VBox?>-->
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Separator?>
-<AnchorPane fx:id="root" stylesheets="@style.css"
-            xmlns="http://javafx.com/javafx/17.0.14"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.devicemonitor.controller.MainController">
+<!--<?import javafx.scene.control.Button?>-->
+<!--<?import javafx.scene.control.ToolBar?>-->
+<!--<?import javafx.scene.control.Separator?>-->
+<!--<AnchorPane fx:id="root" stylesheets="@style.css"-->
+<!--            xmlns="http://javafx.com/javafx/17.0.14"-->
+<!--            xmlns:fx="http://javafx.com/fxml/1"-->
+<!--            fx:controller="com.devicemonitor.controller.MainController">-->
 
+<!--    <ToolBar AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">-->
+<!--        <Label text="时间同步状态:" style="-fx-font-size: 12px;"/>-->
+<!--        <Label fx:id="localTimeLabel" text="本地时间: 获取中..."-->
+<!--               style="-fx-font-size: 12px; -fx-text-fill: #666;"/>-->
+<!--    </ToolBar>-->
 
-        <AnchorPane>
-            <HBox alignment="CENTER" style="-fx-border-color: red; -fx-border-width: 1;"
-                  AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
-                <Canvas fx:id="statusCanvas" />
-            </HBox>
+<!--        <AnchorPane>-->
+<!--            <HBox alignment="CENTER" style="-fx-border-color: red; -fx-border-width: 1;"-->
+<!--                  AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">-->
+<!--                <Canvas fx:id="statusCanvas" />-->
+<!--            </HBox>-->
 
+<!--            <HBox fx:id="cpuFrequenciesBox" alignment="CENTER" layoutY="61.333333333333336"-->
+<!--                  prefHeight="123.0" prefWidth="747.0"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;"-->
+<!--                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="61.0">-->
+<!--                <Label text="CPU Frequencies" />-->
+<!--            </HBox>-->
 
-            <ToolBar AnchorPane.leftAnchor="30" AnchorPane.topAnchor="400">
-                <Label style="-fx-font-size: 12px;"/>
-                <Label fx:id="localTimeLabel"
-                       style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
-            </ToolBar>
+<!--            <VBox alignment="CENTER" layoutX="41" prefHeight="42"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: black; -fx-border-width: 1;">-->
+<!--            <Label fx:id="statusLabel" text="初始化.." />-->
+<!--            </VBox>-->
 
+<!--            <VBox alignment="CENTER" layoutY="40" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="activityLabel" text="初始化.." />-->
+<!--            </VBox>-->
 
+<!--            <VBox alignment="CENTER" layoutX="94" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="phoneModelLabel" />-->
+<!--            </VBox>-->
 
+<!--            <VBox alignment="CENTER" layoutX="94" layoutY="21" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="softwareVersionLabel" />-->
+<!--            </VBox>-->
 
+<!--            <VBox alignment="CENTER" layoutX="245" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="ramLabel" text="8G" />-->
+<!--            </VBox>-->
 
-            <HBox fx:id="cpuFrequenciesBox" alignment="CENTER" layoutY="61.333333333333336"
-                  prefHeight="123.0" prefWidth="747.0"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;"
-                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="61.0">
-                <Label text="CPU Frequencies" />
-            </HBox>
+<!--            <VBox alignment="CENTER" layoutX="270" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="romLabel" text="256G" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="41" prefHeight="42"
-                  style="-fx-padding: 0; -fx-border-color: black; -fx-border-width: 1;">
-            <Label fx:id="statusLabel" text="初始化.." />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="270" layoutY="200" prefHeight="20"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="fpsLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutY="40" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="activityLabel" text="初始化.." />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="380" layoutY="200" prefHeight="20"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="buildTypeLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="94" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="phoneModelLabel" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="380" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="androidVersionLabel" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="94" layoutY="21" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="softwareVersionLabel" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="465" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="batterySizeLabel" text="5000mAh" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="245" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="ramLabel" text="8G" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="430" layoutY="21" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="displaySizeLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="270" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="romLabel" text="256G" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="580" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="cpuTempTitleLabel" text="CPU" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="270" layoutY="200" prefHeight="20"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="fpsLabel"/>
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="580" layoutY="21" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="cpuTempLabel" text="38.6" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="380" layoutY="200" prefHeight="20"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="buildTypeLabel"/>
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="630" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="batteryTempTitleLabel" text="Battery" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="380" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="androidVersionLabel" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="630" layoutY="21" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="batteryTempLabel" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="465" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="batterySizeLabel" text="5000mAh" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="690" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="thermalTempTitleLabel" text="Thermal" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="430" layoutY="21" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="displaySizeLabel"/>
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="21" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="thermalTempLabel" text="51.4" />-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="580" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="cpuTempTitleLabel" text="CPU" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="171" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="socTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="580" layoutY="21" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="cpuTempLabel" text="38.6" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="191" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="cpuSmallCoreTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="630" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="batteryTempTitleLabel" text="Battery" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="211" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="cpuBigCoreTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="630" layoutY="21" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="batteryTempLabel" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="231" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="modemTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="690" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="thermalTempTitleLabel" text="Thermal" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="251" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="pmicTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="700" layoutY="21" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="thermalTempLabel" text="51.4" />
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="271" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="cameraTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="700" layoutY="171" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="socTempLabel"/>
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="700" layoutY="291" prefHeight="21"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Label fx:id="gpuTempLabel"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="700" layoutY="191" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="cpuSmallCoreTempLabel"/>
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="300" layoutY="291"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Button text="默认亮度" onAction="#brightnessSetDefault"/>-->
+<!--                <Label fx:id="resultLabel"-->
+<!--                       style="-fx-text-fill: #666; -fx-font-size: 10px;"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="700" layoutY="211" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="cpuBigCoreTempLabel"/>
-            </VBox>
+<!--            <VBox alignment="CENTER" layoutX="400" layoutY="291"-->
+<!--                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">-->
+<!--                <Button fx:id="powerHalButton" text="关闭PowerHal" onAction="#togglePowerHal"/>-->
+<!--                <Label fx:id="powerHalStatus"-->
+<!--                       style="-fx-text-fill: #666; -fx-font-size: 10px;"/>-->
+<!--            </VBox>-->
 
-            <VBox alignment="CENTER" layoutX="700" layoutY="231" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="modemTempLabel"/>
-            </VBox>
-
-            <VBox alignment="CENTER" layoutX="700" layoutY="251" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="pmicTempLabel"/>
-            </VBox>
-
-            <VBox alignment="CENTER" layoutX="700" layoutY="271" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="cameraTempLabel"/>
-            </VBox>
-
-            <VBox alignment="CENTER" layoutX="700" layoutY="291" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="gpuTempLabel"/>
-            </VBox>
-
-            <VBox alignment="CENTER" layoutX="700" layoutY="315" prefHeight="21"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="dpiLabel"/>
-            </VBox>
-
-            <VBox alignment="CENTER" layoutX="300" layoutY="291"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Button text="默认亮度" onAction="#brightnessSetDefault"/>
-                <Label fx:id="resultLabel"
-                       style="-fx-text-fill: #666; -fx-font-size: 10px;"/>
-            </VBox>
-
-            <VBox alignment="CENTER" layoutX="400" layoutY="291"
-                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Button fx:id="powerHalButton" text="关闭PowerHal" onAction="#togglePowerHal"/>
-                <Label fx:id="powerHalStatus"
-                       style="-fx-text-fill: #666; -fx-font-size: 10px;"/>
-            </VBox>
-
-        </AnchorPane>
+<!--        </AnchorPane>-->
 
 
-</AnchorPane>
+<!--</AnchorPane>-->
