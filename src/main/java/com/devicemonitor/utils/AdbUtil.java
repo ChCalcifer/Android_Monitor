@@ -1,7 +1,6 @@
 package com.devicemonitor.utils;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.apache.commons.exec.*;
 
@@ -11,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -143,6 +143,45 @@ public class AdbUtil {
         });
     }
 
+    /**
+     * build版本 获取build版本。
+     */
+    public static void getBuildType(Label buildTypeLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取设备buildType
+                String output = executeCommand(ADB_PATH + " shell getprop ro.build.type");
+                if (output != null && !output.isEmpty()) {
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> buildTypeLabel.setText(output.trim()));
+                } else {
+                    Platform.runLater(() -> buildTypeLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> buildTypeLabel.setText("None"));
+            }
+        });
+    }
+
+    /**
+     * dpi 获取dpi。
+     */
+    public static void getDpi(Label buildTypeLabel) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取设备dpi
+                String output = executeCommand(ADB_PATH + " shell wm density");
+                if (output != null && !output.isEmpty()) {
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> buildTypeLabel.setText(output.trim()));
+                } else {
+                    Platform.runLater(() -> buildTypeLabel.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> buildTypeLabel.setText("None"));
+            }
+        });
+    }
 
 
     /**
@@ -165,7 +204,7 @@ public class AdbUtil {
 
                 String frameRate = parseFrameRate(output);
                 Platform.runLater(() -> {
-                    if (isValidFPS(frameRate)) {
+                    if (isValidFps(frameRate)) {
                         fpsLabel.setText(frameRate + " FPS");
                     } else {
                         fpsLabel.setText("0 FPS");
@@ -184,13 +223,13 @@ public class AdbUtil {
      */
     private static String parseFrameRate(String output) {
         return output.lines()
-                .skip(1) // 跳过标题行
+                .skip(1)
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
                 .map(FPS_PATTERN::matcher)
                 .filter(Matcher::find)
                 .map(m -> m.group(1))
-                .filter(fps -> !fps.equals("-1"))
+                .filter(fps -> !"-1".equals(fps))
                 .findFirst()
                 .orElse(null);
     }
@@ -198,11 +237,9 @@ public class AdbUtil {
     /**
      * FPS。
      */
-    private static boolean isValidFPS(String fps) {
-        return fps != null && !fps.isEmpty() && !fps.equals("-1");
+    private static boolean isValidFps(String fps) {
+        return fps != null && !fps.isEmpty() && !"-1".equals(fps);
     }
-
-
 
     /**
      * Activity 获取并更新Activity。
@@ -223,7 +260,6 @@ public class AdbUtil {
             }
         });
     }
-
 
     /**
      * Soc温度 获取并更新Soc温度。
@@ -324,7 +360,7 @@ public class AdbUtil {
     /**
      * PMIC温度 获取并更新PMIC温度。
      */
-    public static void getPMICTemp(Label pmicTempLabel) {
+    public static void getPmicTemp(Label pmicTempLabel) {
         executorService.submit(() -> {
             try {
                 // 执行命令获取PMIC温度
@@ -346,7 +382,7 @@ public class AdbUtil {
     }
 
     /**
-     * PMIC温度 获取并更新PMIC温度。
+     * PMIC温度 获取并更新Camera温度。
      */
     public static void getCameraTemp(Label cameraTempLabel) {
         executorService.submit(() -> {
@@ -370,7 +406,7 @@ public class AdbUtil {
     }
 
     /**
-     * PMIC温度 获取并更新PMIC温度。
+     * PMIC温度 获取并更新GPU温度。
      */
     public static void getGpuTemp(Label cameraTempLabel) {
         executorService.submit(() -> {
@@ -392,7 +428,6 @@ public class AdbUtil {
             }
         });
     }
-
 
     /**
      * 电池温度 获取并更新电池温度。
@@ -416,7 +451,7 @@ public class AdbUtil {
                     }
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> batteryTemperatureLabel.setText("error"));
+                Platform.runLater(() -> batteryTemperatureLabel.setText("请插入设备"));
             }
             // 从0秒开始，每20秒执行一次
         }, 0, 20, TimeUnit.SECONDS);
@@ -485,11 +520,8 @@ public class AdbUtil {
                 String deviceDisplaySize = parseDisplaySize(output);
 
                 Platform.runLater(() -> {
-                    if (deviceDisplaySize != null) {
-                        displaySizeLabel.setText(deviceDisplaySize);
-                    } else {
-                        displaySizeLabel.setText("Unknown");
-                    }
+                    // 使用 Objects.requireNonNullElse 来替代 if 语句
+                    displaySizeLabel.setText(Objects.requireNonNullElse(deviceDisplaySize, "Unknown"));
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> displaySizeLabel.setText("error"));
@@ -519,6 +551,7 @@ public class AdbUtil {
      * 默认亮度 将屏幕亮度设置为默认。
      */
     public static void setScreenBrightness(int value, Label resultLabel) {
+        String exception = "Exception", error = "error";
         executorService.submit(() -> {
             try {
                 if (!isDeviceConnected()) {
@@ -530,7 +563,7 @@ public class AdbUtil {
                 String output = executeCommand(command);
 
                 Platform.runLater(() -> {
-                    if (output.contains("Exception") || output.contains("error")) {
+                    if (output.contains(exception) || output.contains(error)) {
                         resultLabel.setText("设置失败: 需要ADB权限");
                     } else {
                         resultLabel.setText("亮度已设置为默认");
@@ -538,6 +571,37 @@ public class AdbUtil {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> resultLabel.setText("错误: " + e.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * PowerHal 关闭Powerhal。
+     */
+    public static void setPowerHalState(int value, Label statusLabel) {
+        String exception = "Exception", error = "error";
+
+        executorService.submit(() -> {
+            try {
+                if (!isDeviceConnected()) {
+                    Platform.runLater(() -> statusLabel.setText("设备未连接"));
+                    return;
+                }
+
+                // 修复命令拼接增加空格
+                String command = ADB_PATH + " shell setprop persist.vendor.powerhal.enable " + value;
+                String output = executeCommand(command);
+
+                Platform.runLater(() -> {
+                    if (output.contains(exception) || output.contains(error)) {
+                        statusLabel.setText("设置失败: 需要ADB权限");
+                    } else {
+                        String state = value == 1 ? "已开启" : "已关闭";
+                        statusLabel.setText("PowerHal状态: " + state);
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> statusLabel.setText("错误: " + e.getMessage()));
             }
         });
     }
@@ -566,7 +630,7 @@ public class AdbUtil {
             int exitValue = executor.execute(cmdLine);
             if (exitValue != 0) {
                 String errorMessage = "Exit code " + exitValue + ": " + errorStream.toString(StandardCharsets.UTF_8);
-                throw new IOException(errorMessage); // 抛出异常
+                throw new IOException(errorMessage);
             }
             return outputStream.toString(StandardCharsets.UTF_8);
 

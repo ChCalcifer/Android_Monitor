@@ -2,20 +2,31 @@ package com.devicemonitor.controller;
 
 import com.devicemonitor.DeviceMonitor;
 import com.devicemonitor.utils.AdbUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 
 /**
  * Author: CYC
@@ -29,6 +40,7 @@ import javafx.scene.control.Label;
 public class MainController implements Initializable, DeviceMonitor.DeviceStatusListener {
     @FXML
     private Canvas statusCanvas;
+
     @FXML
     private HBox cpuFrequenciesBox;
     @FXML
@@ -47,7 +59,35 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
             pmicTempLabel,
             cameraTempLabel,
             gpuTempLabel,
-            resultLabel;
+            resultLabel,
+            powerHalStatus,
+            buildTypeLabel,
+            localTimeLabel,
+            dpiLabel;
+    @FXML
+    private Button powerHalButton;
+
+    /**
+    状态变量，true表示当前是关闭状态
+    */
+    private boolean isPowerHalDisabled = true;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private Timeline timeline;
+
+    @FXML
+    private void togglePowerHal() {
+        if (isPowerHalDisabled) {
+            // 如果当前是关闭状态，执行开启操作
+            AdbUtil.setPowerHalState(1, powerHalStatus);
+            powerHalButton.setText("开启PowerHal");
+        } else {
+            // 如果当前是开启状态，执行关闭操作
+            AdbUtil.setPowerHalState(0, powerHalStatus);
+            powerHalButton.setText("关闭PowerHal");
+        }
+        isPowerHalDisabled = !isPowerHalDisabled;
+    }
 
     private DeviceMonitor deviceMonitor;
 
@@ -68,6 +108,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         deviceMonitor.startMonitoring(this);
 
         updateDeviceInfo();
+        setupTimeUpdater();
+        updateLocalTime();
     }
 
     private void initFrequencyLabels() {
@@ -98,14 +140,16 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         AdbUtil.getSmCoreTemp(cpuSmallCoreTempLabel);
         AdbUtil.getBigCoreTemp(cpuBigCoreTempLabel);
         AdbUtil.getModemTemp(modemTempLabel);
-        AdbUtil.getPMICTemp(pmicTempLabel);
+        AdbUtil.getPmicTemp(pmicTempLabel);
         AdbUtil.getCameraTemp(cameraTempLabel);
         AdbUtil.getGpuTemp(gpuTempLabel);
+        AdbUtil.getBuildType(buildTypeLabel);
+        AdbUtil.getDpi(dpiLabel);
     }
 
     @FXML
-    private void handleExecuteCommand() {
-        AdbUtil.setScreenBrightness(102, resultLabel); // 102是默认亮度值
+    private void brightnessSetDefault() {
+        AdbUtil.setScreenBrightness(102, resultLabel);
     }
 
     @Override
@@ -168,9 +212,35 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         statusLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
+    /**
+     * 新增时间更新方法
+     * */
+    private void setupTimeUpdater() {
+        timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), e -> {
+                    updateLocalTime();
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+
+    private void updateLocalTime() {
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        String formattedTime = now.format(formatter);
+        localTimeLabel.setText(formattedTime);
+    }
+
+
     public void shutdown() {
         if (deviceMonitor != null) {
             deviceMonitor.stopMonitoring();
+        }
+
+        // 新增停止时间更新
+        if (timeline != null) {
+            timeline.stop();
         }
     }
 }

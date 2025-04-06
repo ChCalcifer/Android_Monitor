@@ -7,7 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import static com.devicemonitor.utils.AdbUtil.shutdownExecutor;
 
 /**
  * Author: CYC

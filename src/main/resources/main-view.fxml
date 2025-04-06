@@ -7,7 +7,12 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.Button?>
-<AnchorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.14" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.MainController">
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Separator?>
+<AnchorPane fx:id="root" stylesheets="@style.css"
+            xmlns="http://javafx.com/javafx/17.0.14"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.devicemonitor.controller.MainController">
 
 
         <AnchorPane>
@@ -15,6 +20,17 @@
                   AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
                 <Canvas fx:id="statusCanvas" />
             </HBox>
+
+
+            <ToolBar AnchorPane.leftAnchor="30" AnchorPane.topAnchor="400">
+                <Label style="-fx-font-size: 12px;"/>
+                <Label fx:id="localTimeLabel"
+                       style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            </ToolBar>
+
+
+
+
 
             <HBox fx:id="cpuFrequenciesBox" alignment="CENTER" layoutY="61.333333333333336"
                   prefHeight="123.0" prefWidth="747.0"
@@ -55,7 +71,12 @@
 
             <VBox alignment="CENTER" layoutX="270" layoutY="200" prefHeight="20"
                   style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Label fx:id="fpsLabel" text="256G" />
+                <Label fx:id="fpsLabel"/>
+            </VBox>
+
+            <VBox alignment="CENTER" layoutX="380" layoutY="200" prefHeight="20"
+                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
+                <Label fx:id="buildTypeLabel"/>
             </VBox>
 
             <VBox alignment="CENTER" layoutX="380" prefHeight="21"
@@ -138,12 +159,25 @@
                 <Label fx:id="gpuTempLabel"/>
             </VBox>
 
-            <VBox alignment="CENTER" layoutX="300" layoutY="291" prefHeight="21"
+            <VBox alignment="CENTER" layoutX="700" layoutY="315" prefHeight="21"
                   style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
-                <Button text="默认亮度" onAction="#handleExecuteCommand"/>
-                <Label fx:id="resultLabel" text="状态：等待操作"
+                <Label fx:id="dpiLabel"/>
+            </VBox>
+
+            <VBox alignment="CENTER" layoutX="300" layoutY="291"
+                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
+                <Button text="默认亮度" onAction="#brightnessSetDefault"/>
+                <Label fx:id="resultLabel"
                        style="-fx-text-fill: #666; -fx-font-size: 10px;"/>
             </VBox>
+
+            <VBox alignment="CENTER" layoutX="400" layoutY="291"
+                  style="-fx-padding: 0; -fx-border-color: red; -fx-border-width: 1;">
+                <Button fx:id="powerHalButton" text="关闭PowerHal" onAction="#togglePowerHal"/>
+                <Label fx:id="powerHalStatus"
+                       style="-fx-text-fill: #666; -fx-font-size: 10px;"/>
+            </VBox>
+
         </AnchorPane>
 
 
