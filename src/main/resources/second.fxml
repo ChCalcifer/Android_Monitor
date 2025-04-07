@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.MainController">
+
+    <left>
+        <VBox fx:id="leftRootVBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <ListView fx:id="menuListView" onMouseClicked="#handleMenuClick" prefHeight="400.0" prefWidth="200.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="设备信息" />
+                            <String fx:value="CPU" />
+                            <String fx:value="GPU" />
+                            <String fx:value="Display" />
+                            <String fx:value="特色功能" />
+                            <String fx:value="设备解锁" />
+                            <String fx:value="Spd" />
+                            <String fx:value="设置" />
+                        </FXCollections>
+                    </items>
+                </ListView>
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <!-- 这个区域将被多个Pane替代 -->
+        <Pane fx:id="contentPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <!-- 每个Pane在点击时会显示相应的内容 -->
+            <VBox fx:id="deviceInfoPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- 设备信息的内容 -->
+                <Label fx:id="deviceInfoPaneLabel" text="设备信息" />
+            </VBox>
+            <VBox fx:id="cpuPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- CPU的内容 -->
+                <Label fx:id="cpuPaneLabel" prefHeight="Infinity" prefWidth="Infinity" text="CPU" />
+            </VBox>
+            <VBox fx:id="gpuPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- GPU的内容 -->
+                <Label fx:id="gpuPaneLabel" prefHeight="Infinity" prefWidth="Infinity" text="GPU" />
+            </VBox>
+            <VBox fx:id="displayPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- Display的内容 -->
+                <Label prefHeight="Infinity" prefWidth="Infinity" text="Display" />
+            </VBox>
+            <VBox fx:id="specialFunctionPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- 特色功能的内容 -->
+                <Label prefHeight="Infinity" prefWidth="Infinity" text="特色功能" />
+            </VBox>
+            <VBox fx:id="deviceUnlockPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- 设备解锁的内容 -->
+                <Label prefHeight="Infinity" prefWidth="Infinity" text="设备解锁" />
+            </VBox>
+            <VBox fx:id="spdPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- Spd的内容 -->
+                <Label prefHeight="Infinity" prefWidth="Infinity" text="spd" />
+            </VBox>
+            <VBox fx:id="settingsPane" prefHeight="Infinity" prefWidth="Infinity" visible="false">
+                <!-- 设置的内容 -->
+                <Label prefHeight="Infinity" prefWidth="Infinity" text="设置" />
+            </VBox>
+         <FlowPane prefHeight="353.0" prefWidth="501.0" />
+        </Pane>
+    </center>
+    <top>
+        <Pane fx:id="topRootPane" prefHeight="48.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+    </top>
+</BorderPane>

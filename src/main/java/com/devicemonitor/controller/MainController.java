@@ -14,6 +14,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -76,13 +77,27 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     private TabPane tabPane;
 
     @FXML
-    private Tab deviceTab;
+    private Tab deviceTab,
+            cpuTab,
+            gpuTab,
+            displayTab,
+            specialFunctionTab,
+            deviceRootTab,
+            spdTab,
+            settingsTab;
+
     @FXML
-    private Tab cpuTab;
+    private Pane deviceInfoPane,
+            cpuPane,
+            gpuPane,
+            displayPane,
+            specialFunctionPane,
+            deviceUnlockPane,
+            spdPane,
+            settingsPane;
     @FXML
-    private Tab gpuTab;
-    @FXML
-    private Tab displayTab;
+    private ToggleGroup serviceModeGroup;
+
 
     /**
     状态变量，true表示当前是关闭状态
@@ -130,23 +145,30 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         // updateDeviceInfo();
         // setupTimeUpdater();
         // updateLocalTime();
-        disableTabTitleClicks();
+//        disableTabTitleClicks();
     }
-
 
     // 禁用 Tab 的标题点击
-    private void disableTabTitleClicks() {
-        deviceTab.setDisable(true);
-        cpuTab.setDisable(true);
-        gpuTab.setDisable(true);
-        displayTab.setDisable(true);
-
-        // 如果希望 Tab 不能被关闭，可以禁用关闭按钮
-        deviceTab.setClosable(false);
-        cpuTab.setClosable(false);
-        gpuTab.setClosable(false);
-        displayTab.setClosable(false);
-    }
+//    private void disableTabTitleClicks() {
+//        deviceTab.setDisable(true);
+//        cpuTab.setDisable(true);
+//        gpuTab.setDisable(true);
+//        displayTab.setDisable(true);
+//        specialFunctionTab.setDisable(true);
+//        deviceRootTab.setDisable(true);
+//        spdTab.setDisable(true);
+//        settingsTab.setDisable(true);
+//
+//        // 如果希望 Tab 不能被关闭，可以禁用关闭按钮
+//        deviceTab.setClosable(false);
+//        cpuTab.setClosable(false);
+//        gpuTab.setClosable(false);
+//        displayTab.setClosable(false);
+//        specialFunctionTab.setClosable(false);
+//        deviceRootTab.setClosable(false);
+//        spdTab.setClosable(false);
+//        settingsTab.setClosable(false);
+//    }
     // private void initFrequencyLabels() {
     //     // 横向间距
     //     cpuFrequenciesBox.getChildren().clear();
@@ -262,21 +284,42 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
     @FXML
     private void handleMenuClick() {
+        deviceInfoPane.setVisible(false);
+        cpuPane.setVisible(false);
+        gpuPane.setVisible(false);
+        displayPane.setVisible(false);
+        specialFunctionPane.setVisible(false);
+        deviceUnlockPane.setVisible(false);
+        spdPane.setVisible(false);
+        settingsPane.setVisible(false);
+
         String selectedItem = menuListView.getSelectionModel().getSelectedItem();
 
         if (selectedItem != null) {
             switch (selectedItem) {
                 case "设备信息":
-                    tabPane.getSelectionModel().select(deviceTab);
+                    deviceInfoPane.setVisible(true);
                     break;
                 case "CPU":
-                    tabPane.getSelectionModel().select(cpuTab);
+                    cpuPane.setVisible(true);
                     break;
                 case "GPU":
-                    tabPane.getSelectionModel().select(gpuTab);
+                    gpuPane.setVisible(true);
                     break;
                 case "Display":
-                    tabPane.getSelectionModel().select(displayTab);
+                    displayPane.setVisible(true);
+                    break;
+                case "特色功能":
+                    specialFunctionPane.setVisible(true);
+                    break;
+                case "设备解锁":
+                    deviceUnlockPane.setVisible(true);
+                    break;
+                case "Spd":
+                    spdPane.setVisible(true);
+                    break;
+                case "设置":
+                    settingsPane.setVisible(true);
                     break;
                 default:
                     break;
