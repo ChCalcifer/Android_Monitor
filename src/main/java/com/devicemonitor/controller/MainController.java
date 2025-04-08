@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.canvas.Canvas;
 import javafx.util.Duration;
+import javafx.scene.control.SplitPane;
 
 /**
  * Author: CYC
@@ -69,6 +70,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     @FXML
     private Button powerHalButton;
 
+    @FXML
+    private SplitPane splitPane;
 
     @FXML
     private ListView<String> menuListView;
@@ -87,15 +90,6 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
             settingsTab;
 
     @FXML
-    private Pane deviceInfoPane,
-            cpuPane,
-            gpuPane,
-            displayPane,
-            specialFunctionPane,
-            deviceUnlockPane,
-            spdPane,
-            settingsPane;
-    @FXML
     private ToggleGroup serviceModeGroup;
 
 
@@ -111,18 +105,18 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
 
     // @FXML
-    // private void togglePowerHal() {
-    //     if (isPowerHalDisabled) {
-    //         // 如果当前是关闭状态，执行开启操作
-    //         AdbUtil.setPowerHalState(1, powerHalStatus);
-    //         powerHalButton.setText("开启PowerHal");
-    //     } else {
-    //         // 如果当前是开启状态，执行关闭操作
-    //         AdbUtil.setPowerHalState(0, powerHalStatus);
-    //         powerHalButton.setText("关闭PowerHal");
-    //     }
-    //     isPowerHalDisabled = !isPowerHalDisabled;
-    // }
+     private void togglePowerHal() {
+         if (isPowerHalDisabled) {
+             // 如果当前是关闭状态，执行开启操作
+             AdbUtil.setPowerHalState(1, powerHalStatus);
+             powerHalButton.setText("开启PowerHal");
+         } else {
+             // 如果当前是开启状态，执行关闭操作
+             AdbUtil.setPowerHalState(0, powerHalStatus);
+             powerHalButton.setText("关闭PowerHal");
+         }
+         isPowerHalDisabled = !isPowerHalDisabled;
+     }
 
     private DeviceMonitor deviceMonitor;
 
@@ -145,11 +139,11 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         // updateDeviceInfo();
         // setupTimeUpdater();
         // updateLocalTime();
-//        disableTabTitleClicks();
+        disableTabTitleClicks();
     }
 
     // 禁用 Tab 的标题点击
-//    private void disableTabTitleClicks() {
+    private void disableTabTitleClicks() {
 //        deviceTab.setDisable(true);
 //        cpuTab.setDisable(true);
 //        gpuTab.setDisable(true);
@@ -158,8 +152,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 //        deviceRootTab.setDisable(true);
 //        spdTab.setDisable(true);
 //        settingsTab.setDisable(true);
-//
-//        // 如果希望 Tab 不能被关闭，可以禁用关闭按钮
+
+        // 如果希望 Tab 不能被关闭，可以禁用关闭按钮
 //        deviceTab.setClosable(false);
 //        cpuTab.setClosable(false);
 //        gpuTab.setClosable(false);
@@ -168,7 +162,7 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 //        deviceRootTab.setClosable(false);
 //        spdTab.setClosable(false);
 //        settingsTab.setClosable(false);
-//    }
+    }
     // private void initFrequencyLabels() {
     //     // 横向间距
     //     cpuFrequenciesBox.getChildren().clear();
@@ -284,46 +278,57 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
     @FXML
     private void handleMenuClick() {
-        deviceInfoPane.setVisible(false);
-        cpuPane.setVisible(false);
-        gpuPane.setVisible(false);
-        displayPane.setVisible(false);
-        specialFunctionPane.setVisible(false);
-        deviceUnlockPane.setVisible(false);
-        spdPane.setVisible(false);
-        settingsPane.setVisible(false);
 
         String selectedItem = menuListView.getSelectionModel().getSelectedItem();
 
         if (selectedItem != null) {
             switch (selectedItem) {
                 case "设备信息":
-                    deviceInfoPane.setVisible(true);
+                    showTab(deviceTab);
                     break;
                 case "CPU":
-                    cpuPane.setVisible(true);
+                    showTab(cpuTab);
                     break;
                 case "GPU":
-                    gpuPane.setVisible(true);
+                    showTab(gpuTab);
                     break;
                 case "Display":
-                    displayPane.setVisible(true);
+                    showTab(displayTab);
                     break;
                 case "特色功能":
-                    specialFunctionPane.setVisible(true);
+                    showTab(specialFunctionTab);
                     break;
                 case "设备解锁":
-                    deviceUnlockPane.setVisible(true);
+                    showTab(deviceRootTab);
                     break;
                 case "Spd":
-                    spdPane.setVisible(true);
+                    showTab(spdTab);
                     break;
                 case "设置":
-                    settingsPane.setVisible(true);
+                    showTab(settingsTab);
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    private void showTab(Tab tab) {
+        if (!tabPane.getTabs().contains(tab)) {
+            tabPane.getTabs().add(tab);
+        }
+        tabPane.getSelectionModel().select(tab);
+    }
+
+    @FXML
+    public void setSplitPaneStable() {
+        // 获取FXML文件中的SplitPane
+        if (splitPane != null) {
+            splitPane.getDividers().get(0).positionProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal.doubleValue() != 0.15) {
+                    splitPane.setDividerPosition(0, 0.15);
+                }
+            });
         }
     }
 

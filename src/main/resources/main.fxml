@@ -9,7 +9,13 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="400.0" prefWidth="600.0"
+            stylesheets="@style.css"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.devicemonitor.controller.MainController">
 
     <left>
         <VBox fx:id="leftRootVBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
@@ -32,7 +38,7 @@
         </VBox>
     </left>
     <center>
-        <TabPane fx:id="tabPane" focusTraversable="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" rotateGraphic="true" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <TabPane fx:id="tabPane" focusTraversable="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" rotateGraphic="true" BorderPane.alignment="CENTER">
             <tabs>
                 <Tab fx:id="deviceTab" text="设备信息">
                     <content>

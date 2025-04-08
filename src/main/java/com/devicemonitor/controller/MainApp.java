@@ -1,12 +1,10 @@
 package com.devicemonitor.controller;
 
-import com.devicemonitor.utils.AdbUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 
 /**
  * Author: CYC
@@ -22,12 +20,15 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/new.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
 
+        MainController mainController = loader.getController();
+        mainController.setSplitPaneStable();
+
         Scene scene = new Scene(root, 950, 600);
-        primaryStage.setTitle("Android Monitor V1.0");
+        primaryStage.setTitle("MTK Monitor V1.0");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);
         primaryStage.show();

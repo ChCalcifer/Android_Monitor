@@ -5,15 +5,15 @@
 
 /* 隐藏未选中的 Tab */
 .tab {
-    -fx-alignment: center;
-    -fx-background-color: white; /* 设置 Tab 背景为白色 */
-    -fx-text-fill: white; /* 设置文本颜色为黑色 */
-    -fx-opacity: 0; /* 设置未选中的 Tab 透明度为 0.2 */
-    -fx-pref-width: 105px; /* 固定宽度 */
-    -fx-tab-max-width: Infinity;
-    -fx-pref-height: 45px; /* 固定高度 */
-    -fx-font-size: 14px; /* 修改字体大小 */
-    -fx-font-family: "Segoe UI", sans-serif; /* 更加美观的字体 */
+    /*-fx-alignment: center;*/
+    /*-fx-background-color: white; !* 设置 Tab 背景为白色 *!*/
+    /*-fx-text-fill: white; !* 设置文本颜色为黑色 *!*/
+    /*-fx-opacity: 0; !* 设置未选中的 Tab 透明度为 0.2 *!*/
+    /*-fx-pref-width: 105px; !* 固定宽度 *!*/
+    /*-fx-tab-max-width: Infinity;*/
+    /*-fx-pref-height: 45px; !* 固定高度 *!*/
+    /*-fx-font-size: 14px; !* 修改字体大小 *!*/
+    /*-fx-font-family: "Segoe UI", sans-serif; !* 更加美观的字体 *!*/
 }
 
 /* 设置选中的 Tab 样式 */
