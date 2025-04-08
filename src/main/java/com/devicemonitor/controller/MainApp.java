@@ -28,6 +28,9 @@ public class MainApp extends Application {
         mainController.setSplitPaneStable();
 
         Scene scene = new Scene(root, 950, 600);
+
+        primaryStage.setMinWidth(950);
+        primaryStage.setMinHeight(600);
         primaryStage.setTitle("MTK Monitor V1.0");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);

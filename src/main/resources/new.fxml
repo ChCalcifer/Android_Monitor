@@ -10,7 +10,14 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 
-<SplitPane fx:id="splitPane" dividerPositions="0.15" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/17.0.14" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.MainController">
+<SplitPane fx:id="splitPane"
+           dividerPositions="0.15"
+           maxHeight="-Infinity" maxWidth="-Infinity"
+           minHeight="-Infinity" minWidth="-Infinity"
+           prefHeight="600.0" prefWidth="950.0"
+           xmlns="http://javafx.com/javafx/17.0.14"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.devicemonitor.controller.MainController">
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400" prefWidth="90">
                 <ListView fx:id="menuListView"  AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
                     <items>
