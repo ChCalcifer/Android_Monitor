@@ -8,8 +8,10 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -18,6 +20,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -80,12 +83,14 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     private TabPane tabPane;
 
     @FXML
-    private Tab deviceTab,
-            cpuTab,
+    private Tab deviceTab;
+
+
+    private Tab cpuTab,
             gpuTab,
             displayTab,
             specialFunctionTab,
-            deviceRootTab,
+            deviceUnlockTab,
             spdTab,
             settingsTab;
 
@@ -136,6 +141,16 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         deviceMonitor = new DeviceMonitor();
         deviceMonitor.startMonitoring(this);
 
+        menuListView.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        showTab(newValue, newValue);
+                    }
+                });
+
+        deviceTab = tabPane.getTabs().get(0);
+        // 清空其他预定义的Tab
+        tabPane.getTabs().removeIf(tab -> tab != deviceTab);
         // updateDeviceInfo();
         // setupTimeUpdater();
         // updateLocalTime();
@@ -276,49 +291,139 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     //     localTimeLabel.setText(formattedTime);
     // }
 
+
+    private void showTab(String tabType, String tabTitle) {
+        Tab targetTab = null;
+
+        // 遍历现有 Tab，检查是否已经存在相同标题的 Tab
+        for (Tab tab : tabPane.getTabs()) {
+            if (tab.getText().equals(tabTitle)) {
+                targetTab = tab;
+                break;
+            }
+        }
+
+        switch (tabType) {
+            case "设备信息":
+                if (deviceTab == null) {
+                    deviceTab = createTab("设备信息", "/new.fxml");
+                }
+                targetTab = deviceTab;
+                break;
+            case "CPU":
+                if (cpuTab == null) {
+                    cpuTab = createTab("CPU", "/CpuInfoTab.fxml");
+                }
+                targetTab = cpuTab;
+                break;
+            case "GPU":
+                if (gpuTab == null) {
+                    gpuTab = createTab("GPU", "/GpuInfoTab.fxml");
+                }
+                targetTab = gpuTab;
+                break;
+            case "Display":
+                if (displayTab == null) {
+                    displayTab = createTab("Display", "/DisplayInfoTab.fxml");
+                }
+                targetTab = displayTab;
+                break;
+            case "特色功能":
+                if (specialFunctionTab == null) {
+                    specialFunctionTab = createTab("特色功能", "/SpecialFunctionTab.fxml");
+                }
+                targetTab = specialFunctionTab;
+                break;
+            case "设备解锁":
+                if (deviceUnlockTab == null) {
+                    deviceUnlockTab = createTab("设备解锁", "/DeviceUnlockTab.fxml");
+                }
+                targetTab = deviceUnlockTab;
+                break;
+            case "Spd":
+                if (spdTab == null) {
+                    spdTab = createTab("Spd", "/SpdCheckTab.fxml");
+                }
+                targetTab = spdTab;
+                break;
+            case "设置":
+                if (settingsTab == null) {
+                    settingsTab = createTab("设置", "/SettingsTab.fxml");
+                }
+                targetTab = settingsTab;
+                break;
+        }
+
+        if (targetTab != null) {
+            if (!tabPane.getTabs().contains(targetTab)) {
+                tabPane.getTabs().add(targetTab);
+            }
+            tabPane.getSelectionModel().select(targetTab);
+        }
+    }
+
+    private Tab createTab(String title, String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent content = loader.load();
+            Tab newTab = new Tab(title);
+            newTab.setContent(content);
+            newTab.setClosable(true); // 允许关闭
+
+            // Tab关闭时重置对应变量
+            newTab.setOnClosed(event -> {
+                tabPane.getTabs().remove(newTab);
+                switch (title) {
+                    case "CPU": cpuTab = null; break;
+                    case "GPU": gpuTab = null; break;
+                    case "Display": displayTab = null; break;
+                    case "特色功能": specialFunctionTab = null; break;
+                    case "设备解锁": deviceUnlockTab = null; break;
+                    case "Spd": spdTab = null; break;
+                    case "设置": settingsTab = null; break;
+                }
+            });
+            return newTab;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Tab(title + " (加载失败)");
+        }
+    }
+
     @FXML
     private void handleMenuClick() {
-
         String selectedItem = menuListView.getSelectionModel().getSelectedItem();
-
         if (selectedItem != null) {
             switch (selectedItem) {
                 case "设备信息":
-                    showTab(deviceTab);
+                    showTab("设备信息", "设备信息");
                     break;
                 case "CPU":
-                    showTab(cpuTab);
+                    showTab("CPU", "CPU");
                     break;
                 case "GPU":
-                    showTab(gpuTab);
+                    showTab("GPU", "GPU");
                     break;
                 case "Display":
-                    showTab(displayTab);
+                    showTab("Display", "Display");
                     break;
                 case "特色功能":
-                    showTab(specialFunctionTab);
+                    showTab("特色功能", "特色功能");
                     break;
                 case "设备解锁":
-                    showTab(deviceRootTab);
+                    showTab("设备解锁", "设备解锁");
                     break;
                 case "Spd":
-                    showTab(spdTab);
+                    showTab("Spd", "Spd");
                     break;
                 case "设置":
-                    showTab(settingsTab);
-                    break;
-                default:
+                    showTab("设置", "设置");
                     break;
             }
         }
     }
 
-    private void showTab(Tab tab) {
-        if (!tabPane.getTabs().contains(tab)) {
-            tabPane.getTabs().add(tab);
-        }
-        tabPane.getSelectionModel().select(tab);
-    }
+
 
     @FXML
     public void setSplitPaneStable() {

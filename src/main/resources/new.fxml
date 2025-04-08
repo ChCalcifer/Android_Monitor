@@ -10,21 +10,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 
-<SplitPane fx:id="splitPane"
-           dividerPositions="0.15"
-           prefHeight="600.0" prefWidth="950.0"
-           maxHeight="-Infinity" maxWidth="-Infinity"
-           minHeight="-Infinity" minWidth="-Infinity"
-           xmlns="http://javafx.com/javafx/17.0.14"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.devicemonitor.controller.MainController">
+<SplitPane fx:id="splitPane" dividerPositions="0.15" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/17.0.14" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.MainController">
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400" prefWidth="90">
-                <ListView fx:id="menuListView"
-                          onMouseClicked="#handleMenuClick"
-                          AnchorPane.topAnchor="0"
-                          AnchorPane.bottomAnchor="0"
-                          AnchorPane.leftAnchor="0"
-                          AnchorPane.rightAnchor="0">
+                <ListView fx:id="menuListView"  AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="设备信息" />
@@ -40,44 +28,14 @@
                 </ListView>
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400" prefWidth="510">
-                <BorderPane prefHeight="400" prefWidth="510"
-                            AnchorPane.topAnchor="0"
-                            AnchorPane.bottomAnchor="0"
-                            AnchorPane.leftAnchor="0"
-                            AnchorPane.rightAnchor="0">
+                <BorderPane prefHeight="400" prefWidth="510" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
                     <top>
                         <Pane prefHeight="48.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
                     </top>
                     <center>
-                        <TabPane fx:id="tabPane"
-                                 focusTraversable="false"
-                                 nodeOrientation="LEFT_TO_RIGHT"
-                                 prefHeight="200.0" prefWidth="200.0"
-                                 rotateGraphic="true"
-                                 BorderPane.alignment="CENTER">
+                        <TabPane fx:id="tabPane" focusTraversable="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" rotateGraphic="true" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER">
                                 <Tab fx:id="deviceTab" text="设备信息">
                                         <!-- Tab content for Device Info -->
-                                </Tab>
-                                <Tab fx:id="cpuTab" text="CPU">
-                                        <!-- Tab content for CPU -->
-                                </Tab>
-                                <Tab fx:id="gpuTab" text="GPU">
-                                        <!-- Tab content for GPU -->
-                                </Tab>
-                                <Tab fx:id="displayTab" text="Display">
-                                        <!-- Tab content for Display -->
-                                </Tab>
-                                <Tab fx:id="specialFunctionTab" text="特色功能">
-                                        <!-- Tab content for Display -->
-                                </Tab>
-                                <Tab fx:id="deviceRootTab" text="设备解锁">
-                                        <!-- Tab content for Display -->
-                                </Tab>
-                                <Tab fx:id="spdTab" text="Spd">
-                                        <!-- Tab content for Display -->
-                                </Tab>
-                                <Tab fx:id="settingsTab" text="设置">
-                                        <!-- Tab content for Display -->
                                 </Tab>
                         </TabPane>
                     </center>
