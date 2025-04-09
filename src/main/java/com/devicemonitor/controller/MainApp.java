@@ -16,21 +16,21 @@ import javafx.stage.Stage;
  */
 
 public class MainApp extends Application {
-    private MainController controller;
+    private DeviceInfoController controller;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/new.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/DeviceInfoPage.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
 
-        MainController mainController = loader.getController();
-        mainController.setSplitPaneStable();
+        DeviceInfoController deviceInfoController = loader.getController();
+        deviceInfoController.setSplitPaneStable();
 
         Scene scene = new Scene(root, 950, 600);
 
         primaryStage.setMinWidth(950);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinHeight(620);
         primaryStage.setTitle("MTK Monitor V1.0");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);

@@ -61,17 +61,24 @@
     -fx-alignment: center; /* 文字居中 */
     -fx-font-size: 18px; /* 字体大小 */
     -fx-padding: 10px; /* 内边距 */
+    -fx-cursor: hand;
 }
-
-/*!* 设置 ListView 的单元格悬停样式 *!*/
-/*.list-cell:hover {*/
-/*    -fx-background-color: #d0d0d0; !* 悬停时稍深的灰色 *!*/
-/*}*/
 
 /* 设置 ListView 的单元格选中样式 */
 .list-cell:filled:selected {
     -fx-background-color: white; /* 选中时白色背景 */
     -fx-text-fill: black; /* 选中时黑色文字 */
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #FFFFFF; /* 悬停效果 */
+}
+
+.list-cell:pressed {
+    -fx-background-color: #e0e0e0; /* 按压时的背景色 */
+    -fx-scale-x: 0.95;            /* X轴轻微缩小 */
+    -fx-scale-y: 0.95;            /* Y轴轻微缩小 */
+    -fx-transition-duration: 0.1s; /* 过渡时间（JavaFX CSS 不支持该属性，需用代码实现） */
 }
 
 /* 可选：移除选中时的焦点边框 */
@@ -84,7 +91,7 @@
     -fx-background-color: #F1F1F1;
 }
 
-.left-hbox{
+.left-hboxSecond{
     -fx-background-color: #F1F1F1;
 }
 
@@ -113,4 +120,14 @@
 
 .tops-tab{
     -fx-background-color: #F1F1F1;
+}
+
+.left-hboxFirst {
+    -fx-background-color: #F1F1F1;
+    -fx-alignment: center; /* 确保内容居中 */
+}
+
+/* 可选：为Canvas添加阴影效果 */
+#statusCanvas {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
 }
