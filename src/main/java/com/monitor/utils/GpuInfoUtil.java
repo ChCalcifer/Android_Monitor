@@ -1,4 +1,4 @@
-package com.devicemonitor.utils;
+package com.monitor.utils;
 
 /**
  * @Author CYC

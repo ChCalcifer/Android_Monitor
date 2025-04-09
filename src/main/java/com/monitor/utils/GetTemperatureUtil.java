@@ -1,4 +1,4 @@
-package com.devicemonitor.utils;
+package com.monitor.utils;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;

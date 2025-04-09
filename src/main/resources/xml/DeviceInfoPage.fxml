@@ -13,7 +13,14 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.canvas.Canvas?>
-<SplitPane fx:id="splitPane" dividerPositions="0.15" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="950.0" stylesheets="css/DeviceInfoPage.css" xmlns="http://javafx.com/javafx/17.0.14" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.devicemonitor.controller.DeviceInfoController">
+<SplitPane fx:id="splitPane" dividerPositions="0.15"
+           maxHeight="-Infinity" maxWidth="-Infinity"
+           minHeight="-Infinity" minWidth="-Infinity"
+           prefHeight="600.0" prefWidth="950.0"
+           stylesheets="/css/DeviceInfoPage.css"
+           xmlns="http://javafx.com/javafx/17.0.14"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.monitor.controller.DeviceInfoController">
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400" prefWidth="90">
         <VBox alignment="TOP_CENTER"
               AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
@@ -26,12 +33,18 @@
         </VBox>
     </AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400" prefWidth="510">
-        <BorderPane prefHeight="400" prefWidth="510" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <BorderPane prefHeight="400" prefWidth="510"
+                    AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+                    AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <top>
                 <Pane prefHeight="70" prefWidth="600.0" styleClass="tops-tab" BorderPane.alignment="CENTER" />
             </top>
             <center>
-                <TabPane fx:id="tabPane" focusTraversable="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" rotateGraphic="true" styleClass="hidden-tabs" BorderPane.alignment="CENTER">
+                <TabPane fx:id="tabPane" focusTraversable="false"
+                         nodeOrientation="LEFT_TO_RIGHT"
+                         prefHeight="200.0" prefWidth="200.0"
+                         rotateGraphic="true" styleClass="hidden-tabs"
+                         BorderPane.alignment="CENTER">
                     <Tab fx:id="deviceTab" text="信息">
                         <StackPane>
                             <Label fx:id="deviceTabInside" style="-fx-font-size: 16px; -fx-text-fill: #2c3e50;" />

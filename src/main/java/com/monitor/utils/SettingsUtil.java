@@ -1,4 +1,4 @@
-package com.devicemonitor.utils;
+package com.monitor.utils;
 
 /**
  * @Author CYC
@@ -6,5 +6,5 @@ package com.devicemonitor.utils;
  * @Version 1.0.0
  */
 
-public class DeviceUnlockUtil {
+public class SettingsUtil {
 }

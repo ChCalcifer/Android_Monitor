@@ -1,4 +1,4 @@
-package com.devicemonitor.utils;
+package com.monitor.utils;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.devicemonitor.utils.DeviceInfoUtil.isDeviceConnected;
+import static com.monitor.utils.DeviceInfoUtil.isDeviceConnected;
 
 /**
  * @Author CYC

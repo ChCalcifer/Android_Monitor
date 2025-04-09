@@ -1,4 +1,4 @@
-package com.devicemonitor.controller;
+package com.monitor.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -9,12 +9,12 @@ import javafx.scene.control.Label;
  * @Version 1.0.0
  */
 
-public class DeviceUnlockController {
+public class SettingsController {
     @FXML
-    private Label deviceStatusLabel;
+    private Label settingsStatusLabel;
 
     @FXML
     private void initialize() {
-        deviceStatusLabel.setText("设备解锁页面\n（功能待实现）");
+        settingsStatusLabel.setText("设置页面\n（功能待实现）");
     }
 }

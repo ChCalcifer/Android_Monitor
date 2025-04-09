@@ -1,5 +1,7 @@
-package com.devicemonitor.utils;
+package com.monitor.utils;
 
+import javafx.application.Platform;
+import javafx.scene.control.Label;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -8,9 +10,6 @@ import org.apache.commons.exec.PumpStreamHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -18,24 +17,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.monitor.utils.DeviceInfoUtil.isDeviceConnected;
+
 /**
- * Author: CYC
- * Time: 2025/4/9 20:12:33
- * Description:
- * Branch:
- * Version: 1.0
- * @author CYC
+ * @Author CYC
+ * @Date 9/4/2025 上午12:32
+ * @Version 1.0.0
  */
 
-public class CpuInfoUtil {
+public class DisplayInfoUtil {
 
     private static final String ADB_PATH = "adb";
 
-    /**
-     * 空格。
-     */
-    private static final Pattern CPU_FREQUENCY_PATTERN = Pattern.compile("\\d+");
 
+    private static final Pattern FPS_PATTERN = Pattern.compile("^\\s*\\d+\\s+\\S+\\s+\\S+\\s+(-?\\d+)\\b");
 
     /**
      * 异步线程池。
@@ -54,34 +49,60 @@ public class CpuInfoUtil {
     );
 
     /**
-     * CPU频率 获取并更新cpu频率。
+     * FPS 获取并更新帧数。
      */
-    public static List<String> getCpuFrequencies() {
-        try {
-            // 增加超时和错误处理
-            String output = executeCommand(ADB_PATH + " shell \"cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2> /dev/null\"");
-            List<String> result = parseCpuFrequencies(output);
-            return result.isEmpty() ?
-                    Collections.singletonList("No frequency data") : result;
-        } catch (Exception e) {
-            return Collections.singletonList("ADB Error: " + e.getMessage());
-        }
+    public static void getFrameRate(Label fpsLabel) {
+        executorService.submit(() -> {
+            try {
+                if (!isDeviceConnected()){
+                    Platform.runLater(() -> fpsLabel.setText("设备未连接"));
+                    return;
+                }
+
+                // 添加超时和错误流处理
+                String output = executeCommand(ADB_PATH + " shell \"cat /sys/kernel/fpsgo/fstb/fpsgo_status\"");
+                if (output == null) {
+                    Platform.runLater(() -> fpsLabel.setText("no data"));
+                    return;
+                }
+
+                String frameRate = parseFrameRate(output);
+                Platform.runLater(() -> {
+                    if (isValidFps(frameRate)) {
+                        fpsLabel.setText(frameRate + " FPS");
+                    } else {
+                        fpsLabel.setText("0 FPS");
+                    }
+                });
+
+            } catch (Exception e) {
+                Platform.runLater(() -> fpsLabel.setText("需Root"));
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
-     * CPU频率 从adb中提取cpu频率。
+     * FPS adb中获取FPS帧数。
      */
-    private static List<String> parseCpuFrequencies(String output) {
-        List<String> frequencies = new ArrayList<>();
-        Matcher matcher = CPU_FREQUENCY_PATTERN.matcher(output);
-        int coreIndex = 0;
+    private static String parseFrameRate(String output) {
+        return output.lines()
+                .skip(1)
+                .map(String::trim)
+                .filter(line -> !line.isEmpty())
+                .map(FPS_PATTERN::matcher)
+                .filter(Matcher::find)
+                .map(m -> m.group(1))
+                .filter(fps -> !"-1".equals(fps))
+                .findFirst()
+                .orElse(null);
+    }
 
-        while (matcher.find()) {
-            int kHz = Integer.parseInt(matcher.group());
-            double mhz = kHz / 1000.0;
-            frequencies.add(String.format("CPU%d %.1f ", coreIndex++, mhz));
-        }
-        return frequencies.isEmpty() ? Collections.singletonList("N/A") : frequencies;
+    /**
+     * FPS。
+     */
+    private static boolean isValidFps(String fps) {
+        return fps != null && !fps.isEmpty() && !"-1".equals(fps);
     }
 
     /**
@@ -118,4 +139,5 @@ public class CpuInfoUtil {
             executorService.shutdown();
         }
     }
+
 }

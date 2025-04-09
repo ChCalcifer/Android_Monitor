@@ -1,8 +1,6 @@
-package com.devicemonitor.controller;
+package com.monitor.controller;
 
-import com.devicemonitor.DeviceMonitor;
-import com.devicemonitor.utils.DeviceInfoUtil;
-import com.devicemonitor.utils.SpecialFunctionUtil;
+import com.monitor.utils.DeviceInfoUtil;
 import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
@@ -116,7 +114,6 @@ public class DeviceInfoController implements Initializable{
     //      isPowerHalDisabled = !isPowerHalDisabled;
     //  }
 
-    private DeviceMonitor deviceMonitor;
 
     private final ObservableList<Label> frequencyLabels = FXCollections.observableArrayList();
 
@@ -340,49 +337,49 @@ public class DeviceInfoController implements Initializable{
         switch (tabType) {
             case "信息":
                 if (deviceTab == null) {
-                    deviceTab = createTab("信息", "/DeviceInfoPage.fxml");
+                    deviceTab = createTab("信息", "/xml/DeviceInfoPage.fxml");
                 }
                 targetTab = deviceTab;
                 break;
             case "CPU":
                 if (cpuTab == null) {
-                    cpuTab = createTab("CPU", "/CpuInfoTab.fxml");
+                    cpuTab = createTab("CPU", "/xml/CpuInfoTab.fxml");
                 }
                 targetTab = cpuTab;
                 break;
             case "GPU":
                 if (gpuTab == null) {
-                    gpuTab = createTab("GPU", "/GpuInfoTab.fxml");
+                    gpuTab = createTab("GPU", "/xml/GpuInfoTab.fxml");
                 }
                 targetTab = gpuTab;
                 break;
             case "Disp":
                 if (displayTab == null) {
-                    displayTab = createTab("Disp", "/DisplayInfoTab.fxml");
+                    displayTab = createTab("Disp", "/xml/DisplayInfoTab.fxml");
                 }
                 targetTab = displayTab;
                 break;
             case "功能":
                 if (specialFunctionTab == null) {
-                    specialFunctionTab = createTab("功能", "/SpecialFunctionTab.fxml");
+                    specialFunctionTab = createTab("功能", "/xml/SpecialFunctionTab.fxml");
                 }
                 targetTab = specialFunctionTab;
                 break;
             case "解锁":
                 if (deviceUnlockTab == null) {
-                    deviceUnlockTab = createTab("解锁", "/DeviceUnlockTab.fxml");
+                    deviceUnlockTab = createTab("解锁", "/xml/DeviceUnlockTab.fxml");
                 }
                 targetTab = deviceUnlockTab;
                 break;
             case "Spd":
                 if (spdTab == null) {
-                    spdTab = createTab("Spd", "/SpdCheckTab.fxml");
+                    spdTab = createTab("Spd", "/xml/SpdCheckTab.fxml");
                 }
                 targetTab = spdTab;
                 break;
             case "设置":
                 if (settingsTab == null) {
-                    settingsTab = createTab("设置", "/SettingsTab.fxml");
+                    settingsTab = createTab("设置", "/xml/SettingsTab.fxml");
                 }
                 targetTab = settingsTab;
                 break;

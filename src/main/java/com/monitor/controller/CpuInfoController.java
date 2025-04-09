@@ -1,4 +1,4 @@
-package com.devicemonitor.controller;
+package com.monitor.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

@@ -1,5 +1,6 @@
-package com.devicemonitor.controller;
+package com.monitor;
 
+import com.monitor.controller.DeviceInfoController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,7 +21,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/DeviceInfoPage.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/xml/DeviceInfoPage.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
 

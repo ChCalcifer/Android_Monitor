@@ -8,13 +8,14 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.devicemonitor.controller.GpuInfoController"
+            fx:controller="com.monitor.controller.DeviceUnlockController"
             prefHeight="400.0" prefWidth="510.0">
         <BorderPane prefHeight="400" prefWidth="510"
                     AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
                     AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <center>
-                        <Label fx:id="gpuStatusLabel" style="-fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
+                <Label fx:id="deviceStatusLabel" style="-fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
+
             </center>
         </BorderPane>
 </AnchorPane>

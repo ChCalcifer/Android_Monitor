@@ -8,13 +8,13 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.devicemonitor.controller.DisplayInfoController"
+            fx:controller="com.monitor.controller.SpdCheckController"
             prefHeight="400.0" prefWidth="510.0">
         <BorderPane prefHeight="400" prefWidth="510"
                     AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
                     AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <center>
-                <Label fx:id="displayStatusLabel" style="-fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
+                <Label fx:id="spdStatusLabel" style="-fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
             </center>
         </BorderPane>
 </AnchorPane>
