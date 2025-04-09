@@ -1,38 +1,24 @@
 package com.devicemonitor.controller;
 
 import com.devicemonitor.DeviceMonitor;
-import com.devicemonitor.utils.AdbUtil;
-import javafx.animation.KeyFrame;
+import com.devicemonitor.utils.SpecialFunctionUtil;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.canvas.Canvas;
-import javafx.util.Duration;
 import javafx.scene.control.SplitPane;
 
 /**
@@ -85,6 +71,9 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     @FXML
     private Tab deviceTab;
 
+    @FXML
+    private Label deviceTabInside;
+
 
     private Tab cpuTab,
             gpuTab,
@@ -113,11 +102,11 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
      private void togglePowerHal() {
          if (isPowerHalDisabled) {
              // 如果当前是关闭状态，执行开启操作
-             AdbUtil.setPowerHalState(1, powerHalStatus);
+             SpecialFunctionUtil.setPowerHalState(1, powerHalStatus);
              powerHalButton.setText("开启PowerHal");
          } else {
              // 如果当前是开启状态，执行关闭操作
-             AdbUtil.setPowerHalState(0, powerHalStatus);
+             SpecialFunctionUtil.setPowerHalState(0, powerHalStatus);
              powerHalButton.setText("关闭PowerHal");
          }
          isPowerHalDisabled = !isPowerHalDisabled;
@@ -141,6 +130,50 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         deviceMonitor = new DeviceMonitor();
         deviceMonitor.startMonitoring(this);
 
+
+
+        // 设置ListView的固定大小和样式
+        menuListView.setPrefWidth(120);
+        menuListView.setPrefHeight(428);
+
+        tabPane.setTabMinHeight(0);
+        tabPane.setTabMaxHeight(0);
+        tabPane.setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0;");
+
+        deviceTabInside.setText("CPU信息监控页面\n（功能待实现）");
+
+        // 设置ListView的单元格工厂，使文本居中
+        menuListView.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(item);
+                    setAlignment(Pos.CENTER); // 文本居中
+                    setStyle("-fx-font-size: 14px; -fx-padding: 10px;"); // 设置字体大小和内边距
+                }
+            }
+        });
+
+        menuListView.setFixedCellSize(53);
+
+        // 填充菜单项
+        ObservableList<String> menuItems = FXCollections.observableArrayList(
+                "信息",
+                "CPU",
+                "GPU",
+                "Disp",
+                "功能",
+                "解锁",
+                "Spd",
+                "设置"
+        );
+        menuListView.setItems(menuItems);
+
+
         menuListView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue != null) {
@@ -154,30 +187,11 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         // updateDeviceInfo();
         // setupTimeUpdater();
         // updateLocalTime();
-        disableTabTitleClicks();
+
+        menuListView.getSelectionModel().selectFirst();
     }
 
-    // 禁用 Tab 的标题点击
-    private void disableTabTitleClicks() {
-//        deviceTab.setDisable(true);
-//        cpuTab.setDisable(true);
-//        gpuTab.setDisable(true);
-//        displayTab.setDisable(true);
-//        specialFunctionTab.setDisable(true);
-//        deviceRootTab.setDisable(true);
-//        spdTab.setDisable(true);
-//        settingsTab.setDisable(true);
 
-        // 如果希望 Tab 不能被关闭，可以禁用关闭按钮
-//        deviceTab.setClosable(false);
-//        cpuTab.setClosable(false);
-//        gpuTab.setClosable(false);
-//        displayTab.setClosable(false);
-//        specialFunctionTab.setClosable(false);
-//        deviceRootTab.setClosable(false);
-//        spdTab.setClosable(false);
-//        settingsTab.setClosable(false);
-    }
     // private void initFrequencyLabels() {
     //     // 横向间距
     //     cpuFrequenciesBox.getChildren().clear();
@@ -295,18 +309,10 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
     private void showTab(String tabType, String tabTitle) {
         Tab targetTab = null;
 
-        // 遍历现有 Tab，检查是否已经存在相同标题的 Tab
-        for (Tab tab : tabPane.getTabs()) {
-            if (tab.getText().equals(tabTitle)) {
-                targetTab = tab;
-                break;
-            }
-        }
-
         switch (tabType) {
-            case "设备信息":
+            case "信息":
                 if (deviceTab == null) {
-                    deviceTab = createTab("设备信息", "/new.fxml");
+                    deviceTab = createTab("信息", "/new.fxml");
                 }
                 targetTab = deviceTab;
                 break;
@@ -322,21 +328,21 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
                 }
                 targetTab = gpuTab;
                 break;
-            case "Display":
+            case "Disp":
                 if (displayTab == null) {
-                    displayTab = createTab("Display", "/DisplayInfoTab.fxml");
+                    displayTab = createTab("Disp", "/DisplayInfoTab.fxml");
                 }
                 targetTab = displayTab;
                 break;
-            case "特色功能":
+            case "功能":
                 if (specialFunctionTab == null) {
-                    specialFunctionTab = createTab("特色功能", "/SpecialFunctionTab.fxml");
+                    specialFunctionTab = createTab("功能", "/SpecialFunctionTab.fxml");
                 }
                 targetTab = specialFunctionTab;
                 break;
-            case "设备解锁":
+            case "解锁":
                 if (deviceUnlockTab == null) {
-                    deviceUnlockTab = createTab("设备解锁", "/DeviceUnlockTab.fxml");
+                    deviceUnlockTab = createTab("解锁", "/DeviceUnlockTab.fxml");
                 }
                 targetTab = deviceUnlockTab;
                 break;
@@ -355,9 +361,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         }
 
         if (targetTab != null) {
-            if (!tabPane.getTabs().contains(targetTab)) {
-                tabPane.getTabs().add(targetTab);
-            }
+            // 清空所有 Tab，只保留目标 Tab
+            tabPane.getTabs().setAll(targetTab);
             tabPane.getSelectionModel().select(targetTab);
         }
     }
@@ -372,13 +377,12 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
 
             // Tab关闭时重置对应变量
             newTab.setOnClosed(event -> {
-                tabPane.getTabs().remove(newTab);
                 switch (title) {
                     case "CPU": cpuTab = null; break;
                     case "GPU": gpuTab = null; break;
-                    case "Display": displayTab = null; break;
-                    case "特色功能": specialFunctionTab = null; break;
-                    case "设备解锁": deviceUnlockTab = null; break;
+                    case "Disp": displayTab = null; break;
+                    case "功能": specialFunctionTab = null; break;
+                    case "解锁": deviceUnlockTab = null; break;
                     case "Spd": spdTab = null; break;
                     case "设置": settingsTab = null; break;
                 }
@@ -395,8 +399,8 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
         String selectedItem = menuListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             switch (selectedItem) {
-                case "设备信息":
-                    showTab("设备信息", "设备信息");
+                case "信息":
+                    showTab("信息", "信息");
                     break;
                 case "CPU":
                     showTab("CPU", "CPU");
@@ -404,14 +408,14 @@ public class MainController implements Initializable, DeviceMonitor.DeviceStatus
                 case "GPU":
                     showTab("GPU", "GPU");
                     break;
-                case "Display":
-                    showTab("Display", "Display");
+                case "Disp":
+                    showTab("Disp", "Disp");
                     break;
-                case "特色功能":
-                    showTab("特色功能", "特色功能");
+                case "功能":
+                    showTab("功能", "功能");
                     break;
-                case "设备解锁":
-                    showTab("设备解锁", "设备解锁");
+                case "解锁":
+                    showTab("解锁", "解锁");
                     break;
                 case "Spd":
                     showTab("Spd", "Spd");

@@ -1,0 +1,116 @@
+/* 只隐藏Tab标题栏，但保留内容区域 */
+.hidden-tabs .tab-header-area {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    visibility: hidden;
+}
+
+.hidden-tabs .tab-header-background {
+    -fx-opacity: 0;
+    -fx-background-color: transparent;
+}
+
+/* 保留Tab内容区域 */
+.hidden-tabs .tab-content-area {
+    -fx-padding: 0;
+}
+
+/* 隐藏Tab标签文本（但保留内容） */
+.hidden-tabs .tab-label {
+    -fx-text-fill: transparent;
+    -fx-padding: 0;
+}
+
+/* 确保内容区域可见 */
+.hidden-tabs .anchor-pane,
+.hidden-tabs .border-pane {
+    visibility: visible;
+}
+
+/* 设置 SplitPane 的分割线样式 */
+.split-pane-divider {
+    -fx-background-color: black;
+    -fx-background-insets: 0;
+    -fx-padding: 0 0px 0 0px; /* 左右各 2px，使分割线变宽 */
+}
+
+/* 隐藏默认的拖拽手柄（可选） */
+.split-pane-divider .horizontal-grabber,
+.split-pane-divider .vertical-grabber {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* 设置 ListView 的默认样式 */
+.list-view {
+    -fx-font-family: "Roboto Mono";
+    -fx-background-color: #F1F1F1;
+    -fx-border-width: 0;          /* 完全移除边框 */
+    -fx-background-insets: 0;     /* 移除背景插入 */
+    -fx-padding: 0;               /* 移除内边距 */
+    -fx-border-insets: 0;         /* 移除边框插入 */
+}
+
+/* 设置 ListView 的单元格默认样式 */
+.list-cell {
+    -fx-background-color: #F1F1F1; /* 灰色背景 */
+    -fx-text-fill: black; /* 文字颜色 */
+    -fx-alignment: center; /* 文字居中 */
+    -fx-font-size: 18px; /* 字体大小 */
+    -fx-padding: 10px; /* 内边距 */
+}
+
+/*!* 设置 ListView 的单元格悬停样式 *!*/
+/*.list-cell:hover {*/
+/*    -fx-background-color: #d0d0d0; !* 悬停时稍深的灰色 *!*/
+/*}*/
+
+/* 设置 ListView 的单元格选中样式 */
+.list-cell:filled:selected {
+    -fx-background-color: white; /* 选中时白色背景 */
+    -fx-text-fill: black; /* 选中时黑色文字 */
+}
+
+/* 可选：移除选中时的焦点边框 */
+.list-cell:filled:selected:focused {
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+}
+
+.vbox-style{
+    -fx-background-color: #F1F1F1;
+}
+
+.left-hbox{
+    -fx-background-color: #F1F1F1;
+}
+
+.tab{
+    -fx-background-color: #FFFFFF;
+}
+
+#cpuTab{
+    -fx-background-color: #FFFFFF;
+}
+
+/* 为CPU标签页设置背景色 */
+.cpu-tab-container {
+    -fx-background-color: #FFFFFF;
+}
+
+/* 或者如果你想要为所有Tab内容设置背景色 */
+.tab-pane .tab-content-area {
+    -fx-background-color: #FFFFFF;
+}
+
+/* 确保BorderPane也使用白色背景 */
+.border-pane {
+    -fx-background-color: #FFFFFF;
+}
+
+.tops-tab{
+    -fx-background-color: #F1F1F1;
+}

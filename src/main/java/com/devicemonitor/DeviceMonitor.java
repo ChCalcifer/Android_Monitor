@@ -1,6 +1,7 @@
 package com.devicemonitor;
 
-import com.devicemonitor.utils.AdbUtil;
+import com.devicemonitor.utils.CpuInfoUtil;
+import com.devicemonitor.utils.DeviceInfoUtil;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -54,8 +55,8 @@ public class DeviceMonitor {
 
     private void checkDeviceStatus() {
         try {
-            boolean isConnected = AdbUtil.isDeviceConnected();
-            List<String> cpuFrequencies = AdbUtil.getCpuFrequencies();
+            boolean isConnected = DeviceInfoUtil.isDeviceConnected();
+            List<String> cpuFrequencies = CpuInfoUtil.getCpuFrequencies();
 
             if (listener != null) {
                 listener.onStatusUpdate(isConnected, cpuFrequencies);
