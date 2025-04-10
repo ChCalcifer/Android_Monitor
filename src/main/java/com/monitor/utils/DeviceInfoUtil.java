@@ -69,7 +69,7 @@ public class DeviceInfoUtil {
     /**
      * 设备型号 获取设备型号并显示。
      */
-    public static void getDeviceModel(Label phoneModelLabel) {
+    public static void getDeviceModel(Label deviceModelLabel) {
         // 使用线程池来执行任务
         executorService.submit(() -> {
             try {
@@ -77,13 +77,69 @@ public class DeviceInfoUtil {
                 String output = executeCommand(ADB_PATH + " shell getprop ro.product.model");
                 if (output != null && !output.isEmpty()) {
                     // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> phoneModelLabel.setText(output.trim()));
+                    Platform.runLater(() -> deviceModelLabel.setText(output.trim()));
                 } else {
-                    Platform.runLater(() -> phoneModelLabel.setText("Unknown"));
+                    Platform.runLater(() -> deviceModelLabel.setText(""));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> phoneModelLabel.setText("None"));
+                Platform.runLater(() -> deviceModelLabel.setText(""));
             }
+        });
+    }
+
+    /**
+     * 设备型号 获取设备生产版本型号。
+     */
+    public static void getDeviceBuildVersion(Label deviceBuildVersionLabel) {
+        // 使用线程池来执行任务
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取设备型号
+                String output = executeCommand(ADB_PATH + " shell getprop ro.build.version.incremental");
+                if (output != null && !output.isEmpty()) {
+                    // 在 JavaFX 应用程序线程中更新 UI 标签
+                    Platform.runLater(() -> deviceBuildVersionLabel.setText(output.trim()));
+                } else {
+                    Platform.runLater(() -> deviceBuildVersionLabel.setText(""));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> deviceBuildVersionLabel.setText(""));
+            }
+        });
+    }
+
+    /**
+     * 设备型号 获取设备生产版本型号。
+     */
+    public static void getDeviceBuildType(Label deviceBuildVersionLabel) {
+        // 使用线程池来执行任务
+        executorService.submit(() -> {
+            String result = "";
+            try {
+                // 执行命令获取设备型号
+                String output = executeCommand(ADB_PATH + " shell getprop ro.build.type");
+                if (output != null && !output.isEmpty()) {
+                    // 根据返回值进行处理
+                    switch (output.trim()) {
+                        case "userdebug":
+                            result = "UD";
+                            break;
+                        case "userroot":
+                            result = "ROOT";
+                            break;
+                        case "user":
+                            result = "USER";
+                            break;
+                        default:
+                            result = "";
+                            break;
+                    }
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> deviceBuildVersionLabel.setText(""));
+            }
+            final String finalResult = result; // 创建最终的变量
+            Platform.runLater(() -> deviceBuildVersionLabel.setText(" " + finalResult));
         });
     }
 

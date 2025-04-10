@@ -91,9 +91,7 @@
     -fx-background-color: #F1F1F1;
 }
 
-.left-hboxSecond{
-    -fx-background-color: #F1F1F1;
-}
+
 
 .tab{
     -fx-background-color: #FFFFFF;
@@ -125,9 +123,52 @@
 .left-hboxFirst {
     -fx-background-color: #F1F1F1;
     -fx-alignment: center; /* 确保内容居中 */
+    -fx-spacing: 10;
+}
+
+.left-hboxSecond{
+    -fx-background-color: #F1F1F1;
+    -fx-alignment: center;
+    -fx-spacing: 10;
 }
 
 /* 可选：为Canvas添加阴影效果 */
 #statusCanvas {
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+.hboxSecond-canvas{
+
+}
+
+.hboxSecond-label{
+    -fx-font-size: 13;
+}
+
+/* 在 DeviceInfoPage.css 中添加 */
+.timer-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 0 10px;
+}
+
+.left-hboxFirstInsideFirst{
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-background-color: #F1F1F1;
+}
+
+.left-hboxFirstInsideSecond{
+    -fx-font-size: 13px;
+    -fx-text-fill: #2c3e50;
+    -fx-background-color: #F1F1F1;
+}
+
+.deviceModelLabel{
+
+}
+
+.tops-tab{
+    -fx-background-color: #FFFFFF;
 }

@@ -25,11 +25,21 @@
         <VBox alignment="TOP_CENTER"
               AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
               AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-            <HBox prefHeight="70" styleClass="left-hboxFirst" alignment="CENTER">
-                <Canvas fx:id="statusCanvas" width="40" height="40" />
+            <HBox prefHeight="35" styleClass="left-hboxFirstInsideFirst" alignment="BOTTOM_CENTER">
+                <Label fx:id="deviceModelLabel" alignment="CENTER"/>
+            </HBox>
+            <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="TOP_CENTER">
+                <Label fx:id="deviceBuildVersionLabel" alignment="CENTER"/>
+                <Label fx:id="deviceBuildTypeLabel" alignment="CENTER"/>
             </HBox>
             <ListView fx:id="menuListView" style="-fx-alignment: center" VBox.vgrow="ALWAYS"/>
-            <HBox prefHeight="98" styleClass="left-hboxSecond" />
+            <HBox prefHeight="49" styleClass="left-hboxSecond" alignment="CENTER" spacing="5">
+                <Canvas fx:id="statusCanvas" styleClass="hboxSecond-canvas" width="23" height="23" />
+                <Label fx:id="deviceStatusLabel" styleClass="hboxSecond-label" alignment="CENTER"/>
+            </HBox>
+            <HBox prefHeight="49" alignment="TOP_CENTER" spacing="5">
+                <Label fx:id="timerLabel" styleClass="timer-label" alignment="CENTER" text="00:00:00"/>
+            </HBox>
         </VBox>
     </AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400" prefWidth="510">
@@ -37,7 +47,8 @@
                     AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
                     AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <top>
-                <Pane prefHeight="70" prefWidth="600.0" styleClass="tops-tab" BorderPane.alignment="CENTER" />
+                <Pane prefHeight="70" prefWidth="600.0" styleClass="tops-tab"
+                      BorderPane.alignment="CENTER" />
             </top>
             <center>
                 <TabPane fx:id="tabPane" focusTraversable="false"

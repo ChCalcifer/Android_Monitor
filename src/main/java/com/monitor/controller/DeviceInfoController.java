@@ -1,10 +1,7 @@
 package com.monitor.controller;
 
 import com.monitor.utils.DeviceInfoUtil;
-import javafx.animation.FillTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -39,27 +36,7 @@ public class DeviceInfoController implements Initializable{
     private Canvas statusCanvas;
     @FXML
     private HBox cpuFrequenciesBox;
-    @FXML
-    private Label statusLabel,
-            phoneModelLabel,
-            softwareVersionLabel,
-            androidVersionLabel,
-            batteryTempLabel,
-            activityLabel,
-            fpsLabel,
-            displaySizeLabel,
-            socTempLabel,
-            cpuSmallCoreTempLabel,
-            cpuBigCoreTempLabel,
-            modemTempLabel,
-            pmicTempLabel,
-            cameraTempLabel,
-            gpuTempLabel,
-            resultLabel,
-            powerHalStatus,
-            buildTypeLabel,
-            localTimeLabel,
-            dpiLabel;
+
     @FXML
     private Button powerHalButton;
 
@@ -77,6 +54,22 @@ public class DeviceInfoController implements Initializable{
 
     @FXML
     private Label deviceTabInside;
+
+    @FXML
+    private Label deviceStatusLabel;
+
+    @FXML
+    private Label deviceModelLabel;
+
+    @FXML
+    private Label deviceBuildVersionLabel,
+            deviceBuildTypeLabel;
+
+    @FXML
+    private Label timerLabel;
+    private Timeline timerTimeline;
+    private long startTime;
+
 
 
     private Tab cpuTab,
@@ -185,6 +178,8 @@ public class DeviceInfoController implements Initializable{
         // updateLocalTime();
 
         menuListView.getSelectionModel().selectFirst();
+
+        initTimer();
     }
 
     private void setupStatusChecker() {
@@ -201,12 +196,38 @@ public class DeviceInfoController implements Initializable{
         gc.clearRect(0, 0, statusCanvas.getWidth(), statusCanvas.getHeight());
 
         // 绘制圆形指示灯
-        gc.setFill(isConnected ? Color.GREEN : Color.WHITE);
-        gc.fillOval(2, 2, 20, 20); // 留2px边距
+        gc.setFill(isConnected ? Color.LIGHTGREEN : Color.WHITE);
+        gc.fillOval(2, 2, 18, 18); // 留2px边距
 
+        if(isConnected){
+            deviceStatusLabel.setText("已连接");
+            if (!timerTimeline.getStatus().equals(Animation.Status.RUNNING)) {
+                startTime = System.currentTimeMillis();
+                timerTimeline.play();
+            }
+        }else if(!isConnected){
+            deviceStatusLabel.setText("未连接");
+            timerTimeline.stop();
+            timerLabel.setText("00:00:00");
+        }
+
+        updateDeviceNameAndType();
         // 可选：添加边框
-        gc.setStroke(Color.BLACK);
-        gc.strokeOval(1, 1, 20, 20);
+//        gc.setStroke(Color.BLACK);
+//        gc.strokeOval(1, 1, 20, 20);
+    }
+
+    private void updateDeviceNameAndType() {
+        boolean isConnected = DeviceInfoUtil.isDeviceConnected();
+        if(isConnected){
+            DeviceInfoUtil.getDeviceModel(deviceModelLabel);
+            DeviceInfoUtil.getDeviceBuildVersion(deviceBuildVersionLabel);
+            DeviceInfoUtil.getDeviceBuildType(deviceBuildTypeLabel);
+        }else {
+            deviceModelLabel.setText("请插入设备");
+            deviceBuildVersionLabel.setText("");
+            deviceBuildTypeLabel.setText("");
+        }
     }
 
     // private void initFrequencyLabels() {
@@ -419,37 +440,23 @@ public class DeviceInfoController implements Initializable{
         }
     }
 
-    @FXML
-    private void handleMenuClick() {
-        String selectedItem = menuListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-            switch (selectedItem) {
-                case "信息":
-                    showTab("信息", "信息");
-                    break;
-                case "CPU":
-                    showTab("CPU", "CPU");
-                    break;
-                case "GPU":
-                    showTab("GPU", "GPU");
-                    break;
-                case "Disp":
-                    showTab("Disp", "Disp");
-                    break;
-                case "功能":
-                    showTab("功能", "功能");
-                    break;
-                case "解锁":
-                    showTab("解锁", "解锁");
-                    break;
-                case "Spd":
-                    showTab("Spd", "Spd");
-                    break;
-                case "设置":
-                    showTab("设置", "设置");
-                    break;
-            }
-        }
+
+
+    // 在 initialize 方法中初始化计时器
+    private void initTimer() {
+        timerLabel.setText("00:00:00");
+        timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateTimer()));
+        timerTimeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    // 更新计时器显示
+    private void updateTimer() {
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        long seconds = (elapsedTime / 1000) % 60;
+        long minutes = (elapsedTime / (1000 * 60)) % 60;
+        long hours = (elapsedTime / (1000 * 60 * 60));
+
+        timerLabel.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
     }
 
     @FXML
