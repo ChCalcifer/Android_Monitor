@@ -1,7 +1,9 @@
 package com.monitor.utils;
 
+import com.monitor.thread.CustomThreadFactory;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -40,16 +42,9 @@ public class DeviceInfoUtil {
      * 异步线程池。
      */
     private static final ExecutorService executorService = new ThreadPoolExecutor(
-            // 核心线程数
-            10,
-            // 最大线程数
-            50,
-            // 线程空闲时的最大存活时间（秒）
-            60,
-            // 时间单位
-            TimeUnit.SECONDS,
-            // 任务队列
-            new LinkedBlockingQueue<>()
+            5, 15, 60, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(),
+            new CustomThreadFactory("DeviceInfoUtil-Pool")
     );
 
     /**
@@ -67,24 +62,27 @@ public class DeviceInfoUtil {
     }
 
     /**
+     * 通用方法：执行ADB命令并更新Label
+     */
+    private static void executeAdbCommandAndUpdateLabel(String command, Label label, String defaultValue) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(command);
+                String result = (output != null && !output.isEmpty()) ? output.trim() : defaultValue;
+                Platform.runLater(() -> label.setText(result));
+            } catch (Exception e) {
+                Platform.runLater(() -> label.setText(defaultValue));
+            }
+        });
+    }
+
+    /**
      * 设备型号 获取设备型号并显示。
      */
     public static void getDeviceModel(Label deviceModelLabel) {
         // 使用线程池来执行任务
-        executorService.submit(() -> {
-            try {
-                // 执行命令获取设备型号
-                String output = executeCommand(ADB_PATH + " shell getprop ro.product.model");
-                if (output != null && !output.isEmpty()) {
-                    // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> deviceModelLabel.setText(output.trim()));
-                } else {
-                    Platform.runLater(() -> deviceModelLabel.setText(""));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> deviceModelLabel.setText(""));
-            }
-        });
+        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.product.model",
+                deviceModelLabel, "");
     }
 
     /**
@@ -92,20 +90,8 @@ public class DeviceInfoUtil {
      */
     public static void getDeviceBuildVersion(Label deviceBuildVersionLabel) {
         // 使用线程池来执行任务
-        executorService.submit(() -> {
-            try {
-                // 执行命令获取设备型号
-                String output = executeCommand(ADB_PATH + " shell getprop ro.build.version.incremental");
-                if (output != null && !output.isEmpty()) {
-                    // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> deviceBuildVersionLabel.setText(output.trim()));
-                } else {
-                    Platform.runLater(() -> deviceBuildVersionLabel.setText(""));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> deviceBuildVersionLabel.setText(""));
-            }
-        });
+        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.version.incremental",
+                deviceBuildVersionLabel, "");
     }
 
     /**
@@ -147,20 +133,8 @@ public class DeviceInfoUtil {
      * 软件版本 获取软件版本。
      */
     public static void getDeviceSoftwareVersion(Label softwareVersionLabel) {
-        executorService.submit(() -> {
-            try {
-                // 执行命令获取设备型号
-                String output = executeCommand(ADB_PATH + " shell getprop ro.build.display.id");
-                if (output != null && !output.isEmpty()) {
-                    // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> softwareVersionLabel.setText(output.trim()));
-                } else {
-                    Platform.runLater(() -> softwareVersionLabel.setText("Unknown"));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> softwareVersionLabel.setText("None"));
-            }
-        });
+        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.display.id",
+                softwareVersionLabel, "Unknown");
     }
 
     /**
@@ -187,58 +161,40 @@ public class DeviceInfoUtil {
      * build版本 获取build版本。
      */
     public static void getBuildType(Label buildTypeLabel) {
-        executorService.submit(() -> {
-            try {
-                // 执行命令获取设备buildType
-                String output = executeCommand(ADB_PATH + " shell getprop ro.build.type");
-                if (output != null && !output.isEmpty()) {
-                    // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> buildTypeLabel.setText(output.trim()));
-                } else {
-                    Platform.runLater(() -> buildTypeLabel.setText("Unknown"));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> buildTypeLabel.setText("None"));
-            }
-        });
+        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.type",
+                buildTypeLabel, "Unknown");
     }
 
     /**
      * dpi 获取dpi。
      */
     public static void getDpi(Label buildTypeLabel) {
-        executorService.submit(() -> {
-            try {
-                // 执行命令获取设备dpi
-                String output = executeCommand(ADB_PATH + " shell wm density");
-                if (output != null && !output.isEmpty()) {
-                    // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> buildTypeLabel.setText(output.trim()));
-                } else {
-                    Platform.runLater(() -> buildTypeLabel.setText("Unknown"));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> buildTypeLabel.setText("None"));
-            }
-        });
+        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell wm density",
+                buildTypeLabel, "Unknown");
     }
 
     /**
      * Activity 获取并更新Activity。
      */
-    public static void getActivity(Label activityLabel) {
+    public static void getActivity(TextArea gatActivityTextArea) {
         executorService.submit(() -> {
             try {
-                // 执行命令获取设备型号
                 String output = executeCommand(ADB_PATH + " shell \"dumpsys activity top | grep ACTIVITY | tail -n 1\"");
                 if (output != null && !output.isEmpty()) {
-                    // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> activityLabel.setText("CurrentActivity: " + output.trim()));
+                    // 使用正则提取 "ACTIVITY 包名/类名" 部分
+                    Pattern pattern = Pattern.compile("ACTIVITY\\s+([^\\s]+)");
+                    Matcher matcher = pattern.matcher(output);
+                    if (matcher.find()) {
+                        String activityName = matcher.group(1); // 提取匹配的包名/类名
+                        Platform.runLater(() -> gatActivityTextArea.setText(activityName));
+                    } else {
+                        Platform.runLater(() -> gatActivityTextArea.setText("Unknown"));
+                    }
                 } else {
-                    Platform.runLater(() -> activityLabel.setText("Unknown"));
+                    Platform.runLater(() -> gatActivityTextArea.setText("Unknown"));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> activityLabel.setText("None"));
+                Platform.runLater(() -> gatActivityTextArea.setText("None"));
             }
         });
     }
@@ -307,7 +263,7 @@ public class DeviceInfoUtil {
     }
 
     /**
-     *在应用关闭时，确保正确关闭线程池
+     * 在应用关闭时，确保正确关闭线程池
      */
     public static void shutdownExecutor() {
         if (!executorService.isShutdown()) {

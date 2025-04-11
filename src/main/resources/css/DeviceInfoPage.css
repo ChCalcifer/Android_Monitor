@@ -172,3 +172,28 @@
 .tops-tab{
     -fx-background-color: #FFFFFF;
 }
+
+.rightTopHbox{
+    -fx-background-color: #F1F1F1;
+}
+
+/* 为 TextArea 添加样式 */
+.activity-text-area {
+    -fx-font-family: "Arial";
+    -fx-font-size: 12px;  /* 缩小字体以适配高度 */
+    -fx-text-fill: #333333;
+    -fx-background-color: #F1F1F1; /* 背景颜色 */
+    -fx-opacity: 1.0;  /* 完全不透明 */
+    -fx-wrap-text: true;
+    -fx-pref-height: 25px;
+    -fx-max-height: 25px;
+    -fx-min-height: 25px;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-focus-traversable: false;  /* 禁用焦点边框 */
+}
+
+.activity-text-area .scroll-pane .content {
+    -fx-background-color: #F1F1F1;
+}

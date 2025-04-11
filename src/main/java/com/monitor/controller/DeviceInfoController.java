@@ -50,27 +50,20 @@ public class DeviceInfoController implements Initializable{
     private TabPane tabPane;
 
     @FXML
-    private Tab deviceTab;
-
-    @FXML
-    private Label deviceTabInside;
-
-    @FXML
-    private Label deviceStatusLabel;
-
-    @FXML
-    private Label deviceModelLabel;
-
-    @FXML
     private Label deviceBuildVersionLabel,
-            deviceBuildTypeLabel;
+            deviceBuildTypeLabel,
+            deviceTabInside,
+            deviceStatusLabel,
+            deviceModelLabel,
+            timerLabel,
+            softwareVersionLabel,
+            androidVersionLabel;
 
-    @FXML
-    private Label timerLabel;
     private Timeline timerTimeline;
     private long startTime;
 
-
+    @FXML
+    private Tab deviceTab;
 
     private Tab cpuTab,
             gpuTab,
@@ -79,6 +72,9 @@ public class DeviceInfoController implements Initializable{
             deviceUnlockTab,
             spdTab,
             settingsTab;
+
+    @FXML
+    private TextArea gatActivityTextArea;
 
     @FXML
     private ToggleGroup serviceModeGroup;
@@ -90,9 +86,6 @@ public class DeviceInfoController implements Initializable{
     状态变量，true表示当前是关闭状态
     */
     private boolean isPowerHalDisabled = true;
-
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private Timeline timeline;
 
     // private void togglePowerHal() {
     //      if (isPowerHalDisabled) {
@@ -114,10 +107,6 @@ public class DeviceInfoController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        // 初始化横向标签容器
-        // initFrequencyLabels();
-        // updateStatusMessage(false);
 
         // 设置ListView的固定大小和样式
         menuListView.setPrefWidth(120);
@@ -171,11 +160,9 @@ public class DeviceInfoController implements Initializable{
                 });
 
         deviceTab = tabPane.getTabs().get(0);
+
         // 清空其他预定义的Tab
         tabPane.getTabs().removeIf(tab -> tab != deviceTab);
-        // updateDeviceInfo();
-        // setupTimeUpdater();
-        // updateLocalTime();
 
         menuListView.getSelectionModel().selectFirst();
 
@@ -212,6 +199,7 @@ public class DeviceInfoController implements Initializable{
         }
 
         updateDeviceNameAndType();
+        updateSoftWare();
         // 可选：添加边框
 //        gc.setStroke(Color.BLACK);
 //        gc.strokeOval(1, 1, 20, 20);
@@ -224,9 +212,22 @@ public class DeviceInfoController implements Initializable{
             DeviceInfoUtil.getDeviceBuildVersion(deviceBuildVersionLabel);
             DeviceInfoUtil.getDeviceBuildType(deviceBuildTypeLabel);
         }else {
-            deviceModelLabel.setText("请插入设备");
+            deviceModelLabel.setText("");
             deviceBuildVersionLabel.setText("");
             deviceBuildTypeLabel.setText("");
+        }
+    }
+
+    private void updateSoftWare() {
+        boolean isConnected = DeviceInfoUtil.isDeviceConnected();
+        if(isConnected){
+            DeviceInfoUtil.getAndroidVersion(androidVersionLabel);
+            DeviceInfoUtil.getDeviceSoftwareVersion(softwareVersionLabel);
+            DeviceInfoUtil.getActivity(gatActivityTextArea);
+        }else {
+            androidVersionLabel.setText("");
+            softwareVersionLabel.setText("");
+            gatActivityTextArea.setText("");
         }
     }
 
@@ -245,29 +246,12 @@ public class DeviceInfoController implements Initializable{
     //     cpuFrequenciesBox.getChildren().addAll(frequencyLabels);
     // }
 
-    // public void updateDeviceInfo() {
-    //     // 调用 ADBUtil 中的 displayDeviceModel 方法
-    //     AdbUtil.getDeviceModel(phoneModelLabel);
-    //     AdbUtil.getDeviceSoftwareVersion(softwareVersionLabel);
-    //     AdbUtil.getAndroidVersion(androidVersionLabel);
-    //     AdbUtil.getBatteryTemperature(batteryTempLabel);
-    //     AdbUtil.getActivity(activityLabel);
-    //     AdbUtil.getFrameRate(fpsLabel);
-    //     AdbUtil.getDisplaySize(displaySizeLabel);
-    //     AdbUtil.getSocTemp(socTempLabel);
-    //     AdbUtil.getSmCoreTemp(cpuSmallCoreTempLabel);
-    //     AdbUtil.getBigCoreTemp(cpuBigCoreTempLabel);
-    //     AdbUtil.getModemTemp(modemTempLabel);
-    //     AdbUtil.getPmicTemp(pmicTempLabel);
-    //     AdbUtil.getCameraTemp(cameraTempLabel);
-    //     AdbUtil.getGpuTemp(gpuTempLabel);
-    //     AdbUtil.getBuildType(buildTypeLabel);
-    //     AdbUtil.getDpi(dpiLabel);
-    // }
+
     // @FXML
     // private void brightnessSetDefault() {
     //     AdbUtil.setScreenBrightness(102, resultLabel);
     // }
+
     // @Override
     // public void onStatusUpdate(boolean isConnected, List<String> cpuFrequencies) {
         // Platform.runLater(() -> {
@@ -472,11 +456,6 @@ public class DeviceInfoController implements Initializable{
     }
 
     public void shutdown() {
-        // 新增停止时间更新
-        if (timeline != null) {
-            timeline.stop();
-        }
-
         if (statusCheckTimeline != null) {
             statusCheckTimeline.stop();
         }

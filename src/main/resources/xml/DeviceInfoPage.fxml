@@ -8,11 +8,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.TextArea?>
 <SplitPane fx:id="splitPane" dividerPositions="0.15"
            maxHeight="-Infinity" maxWidth="-Infinity"
            minHeight="-Infinity" minWidth="-Infinity"
@@ -47,8 +47,20 @@
                     AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
                     AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <top>
-                <Pane prefHeight="70" prefWidth="600.0" styleClass="tops-tab"
-                      BorderPane.alignment="CENTER" />
+                <VBox alignment="CENTER">
+                    <HBox prefHeight="35" maxHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="BOTTOM_CENTER">
+                    <Label fx:id="androidVersionLabel" alignment="CENTER"/>
+                    <Label fx:id="softwareVersionLabel" alignment="CENTER"/>
+                    </HBox>
+                    <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="CENTER">
+                    <TextArea fx:id="gatActivityTextArea" editable="false"
+                              wrapText="true"
+                              prefHeight="25"
+                        maxHeight="25"
+                        minHeight="25"
+                        styleClass="activity-text-area"/>
+                    </HBox>
+                </VBox>
             </top>
             <center>
                 <TabPane fx:id="tabPane" focusTraversable="false"
