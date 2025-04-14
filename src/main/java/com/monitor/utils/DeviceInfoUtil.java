@@ -38,6 +38,8 @@ public class DeviceInfoUtil {
      */
     private static final Pattern DISPLAY_SIZE_PATTERN = Pattern.compile("(\\d+)x(\\d+)");
 
+    private static final Pattern DENSITY_PATTERN = Pattern.compile("Physical density: (\\d+)");
+
     /**
      * 异步线程池。
      */
@@ -62,42 +64,27 @@ public class DeviceInfoUtil {
     }
 
     /**
-     * 通用方法：执行ADB命令并更新Label
-     */
-    private static void executeAdbCommandAndUpdateLabel(String command, Label label, String defaultValue) {
-        executorService.submit(() -> {
-            try {
-                String output = executeCommand(command);
-                String result = (output != null && !output.isEmpty()) ? output.trim() : defaultValue;
-                Platform.runLater(() -> label.setText(result));
-            } catch (Exception e) {
-                Platform.runLater(() -> label.setText(defaultValue));
-            }
-        });
-    }
-
-    /**
      * 设备型号 获取设备型号并显示。
      */
-    public static void getDeviceModel(Label deviceModelLabel) {
+    public static void getDeviceModel(TextArea gatDeviceModelTextArea) {
         // 使用线程池来执行任务
         executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.product.model",
-                deviceModelLabel, "");
+                gatDeviceModelTextArea, "");
     }
 
     /**
      * 设备型号 获取设备生产版本型号。
      */
-    public static void getDeviceBuildVersion(Label deviceBuildVersionLabel) {
+    public static void getDeviceBuildVersion(TextArea gatDeviceBuildDateTextArea) {
         // 使用线程池来执行任务
         executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.version.incremental",
-                deviceBuildVersionLabel, "");
+                gatDeviceBuildDateTextArea, "");
     }
 
     /**
      * 设备型号 获取设备生产版本型号。
      */
-    public static void getDeviceBuildType(Label deviceBuildVersionLabel) {
+    public static void getDeviceBuildType(TextArea gatDeviceBuildTypeTextArea) {
         // 使用线程池来执行任务
         executorService.submit(() -> {
             String result = "";
@@ -122,55 +109,74 @@ public class DeviceInfoUtil {
                     }
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> deviceBuildVersionLabel.setText(""));
+                Platform.runLater(() -> gatDeviceBuildTypeTextArea.setText(""));
             }
             final String finalResult = result; // 创建最终的变量
-            Platform.runLater(() -> deviceBuildVersionLabel.setText(" " + finalResult));
+            Platform.runLater(() -> gatDeviceBuildTypeTextArea.setText(finalResult));
         });
     }
 
     /**
      * 软件版本 获取软件版本。
      */
-    public static void getDeviceSoftwareVersion(Label softwareVersionLabel) {
+    public static void getDeviceSoftwareVersion(TextArea gatDeviceBuildVersionTextArea) {
         executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.display.id",
-                softwareVersionLabel, "Unknown");
+                gatDeviceBuildVersionTextArea, "Unknown");
     }
 
     /**
      * 安卓版本 获取安卓版本。
      */
-    public static void getAndroidVersion(Label androidVersionLabel) {
+    public static void getAndroidVersion(TextArea gatAndroidVersionTextArea) {
         executorService.submit(() -> {
             try {
                 // 执行命令获取设备型号
                 String output = executeCommand(ADB_PATH + " shell getprop ro.build.version.release");
                 if (output != null && !output.isEmpty()) {
                     // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> androidVersionLabel.setText("Android " + output.trim()));
+                    Platform.runLater(() -> gatAndroidVersionTextArea.setText(output.trim()));
                 } else {
-                    Platform.runLater(() -> androidVersionLabel.setText("Unknown"));
+                    Platform.runLater(() -> gatAndroidVersionTextArea.setText("Unknown"));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> androidVersionLabel.setText("None"));
+                Platform.runLater(() -> gatAndroidVersionTextArea.setText("None"));
             }
         });
     }
 
     /**
-     * build版本 获取build版本。
+     * dpi 获取dpi。
      */
-    public static void getBuildType(Label buildTypeLabel) {
-        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.type",
-                buildTypeLabel, "Unknown");
+    public static void getDpi(TextArea gatDeviceDpiTextArea) {
+        executorService.submit(() -> {
+            try {
+                // 执行命令获取设备DPI
+                String output = executeCommand(ADB_PATH + " shell wm density");
+
+                String deviceDensity = parseDensity(output);
+
+                Platform.runLater(() -> {
+                    gatDeviceDpiTextArea.setText(Objects.requireNonNullElse(deviceDensity, "Unknown"));
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> gatDeviceDpiTextArea.setText("error"));
+            }
+        });
     }
 
     /**
-     * dpi 获取dpi。
+     * 从adb输出中提取DPI值
      */
-    public static void getDpi(Label buildTypeLabel) {
-        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell wm density",
-                buildTypeLabel, "Unknown");
+    private static String parseDensity(String output) {
+        Matcher matcher = DENSITY_PATTERN.matcher(output);
+
+        if (matcher.find()) {
+            // 返回匹配到的DPI值
+            return matcher.group(1);
+        } else {
+            // 如果没有匹配到，返回null
+            return null;
+        }
     }
 
     /**
@@ -185,16 +191,37 @@ public class DeviceInfoUtil {
                     Pattern pattern = Pattern.compile("ACTIVITY\\s+([^\\s]+)");
                     Matcher matcher = pattern.matcher(output);
                     if (matcher.find()) {
-                        String activityName = matcher.group(1); // 提取匹配的包名/类名
-                        Platform.runLater(() -> gatActivityTextArea.setText(activityName));
+                        String newActivity = matcher.group(1); // 提取匹配的包名/类名
+                        Platform.runLater(() -> {
+                            String currentText = gatActivityTextArea.getText();
+                            // 仅在新值不同时更新
+                            if (!newActivity.equals(currentText)) {
+                                gatActivityTextArea.setText(newActivity);
+                            }
+                        });
                     } else {
-                        Platform.runLater(() -> gatActivityTextArea.setText("Unknown"));
+                        Platform.runLater(() -> {
+                            String currentText = gatActivityTextArea.getText();
+                            if (!"Unknown".equals(currentText)) {
+                                gatActivityTextArea.setText("Unknown");
+                            }
+                        });
                     }
                 } else {
-                    Platform.runLater(() -> gatActivityTextArea.setText("Unknown"));
+                    Platform.runLater(() -> {
+                        String currentText = gatActivityTextArea.getText();
+                        if (!"Unknown".equals(currentText)) {
+                            gatActivityTextArea.setText("Unknown");
+                        }
+                    });
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> gatActivityTextArea.setText("None"));
+                Platform.runLater(() -> {
+                    String currentText = gatActivityTextArea.getText();
+                    if (!"None".equals(currentText)) {
+                        gatActivityTextArea.setText("None");
+                    }
+                });
             }
         });
     }
@@ -202,7 +229,7 @@ public class DeviceInfoUtil {
     /**
      * 屏幕尺寸 获取屏幕尺寸。
      */
-    public static void getDisplaySize(Label displaySizeLabel) {
+    public static void getDisplaySize(TextArea gatDeviceDisplaySizeTextArea) {
         executorService.submit(() -> {
             try {
                 // 执行命令获取设备型号
@@ -212,10 +239,10 @@ public class DeviceInfoUtil {
 
                 Platform.runLater(() -> {
                     // 使用 Objects.requireNonNullElse 来替代 if 语句
-                    displaySizeLabel.setText(Objects.requireNonNullElse(deviceDisplaySize, "Unknown"));
+                    gatDeviceDisplaySizeTextArea.setText(Objects.requireNonNullElse(deviceDisplaySize, "Unknown"));
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> displaySizeLabel.setText("error"));
+                Platform.runLater(() -> gatDeviceDisplaySizeTextArea.setText("error"));
             }
         });
     }
@@ -236,6 +263,21 @@ public class DeviceInfoUtil {
             return null;
         }
 
+    }
+
+    /**
+     * 通用方法：执行ADB命令并更新Label
+     */
+    private static void executeAdbCommandAndUpdateLabel(String command, TextArea textArea, String defaultValue) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(command);
+                String result = (output != null && !output.isEmpty()) ? output.trim() : defaultValue;
+                Platform.runLater(() -> textArea.setText(result));
+            } catch (Exception e) {
+                Platform.runLater(() -> textArea.setText(defaultValue));
+            }
+        });
     }
 
     /**

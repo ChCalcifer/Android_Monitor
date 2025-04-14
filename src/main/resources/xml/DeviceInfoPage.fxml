@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.image.ImageView?>
 <SplitPane fx:id="splitPane" dividerPositions="0.15"
            maxHeight="-Infinity" maxWidth="-Infinity"
            minHeight="-Infinity" minWidth="-Infinity"
@@ -25,20 +27,16 @@
         <VBox alignment="TOP_CENTER"
               AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
               AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-            <HBox prefHeight="35" styleClass="left-hboxFirstInsideFirst" alignment="BOTTOM_CENTER">
-                <Label fx:id="deviceModelLabel" alignment="CENTER"/>
+            <HBox alignment="BOTTOM_CENTER" prefHeight="70" styleClass="left-hboxFirstInsideFirst">
+                <ImageView fx:id="statusIcon" fitWidth="70" fitHeight="70" preserveRatio="true" />
             </HBox>
-            <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="TOP_CENTER">
-                <Label fx:id="deviceBuildVersionLabel" alignment="CENTER"/>
-                <Label fx:id="deviceBuildTypeLabel" alignment="CENTER"/>
+            <ListView fx:id="menuListView" style="-fx-alignment: center" VBox.vgrow="ALWAYS" />
+            <HBox alignment="CENTER" prefHeight="49" spacing="5" styleClass="left-hboxSecond">
+                <Canvas fx:id="statusCanvas" height="23" styleClass="hboxSecond-canvas" width="23" />
+                <Label fx:id="deviceStatusLabel" alignment="CENTER" styleClass="hboxSecond-label" />
             </HBox>
-            <ListView fx:id="menuListView" style="-fx-alignment: center" VBox.vgrow="ALWAYS"/>
-            <HBox prefHeight="49" styleClass="left-hboxSecond" alignment="CENTER" spacing="5">
-                <Canvas fx:id="statusCanvas" styleClass="hboxSecond-canvas" width="23" height="23" />
-                <Label fx:id="deviceStatusLabel" styleClass="hboxSecond-label" alignment="CENTER"/>
-            </HBox>
-            <HBox prefHeight="49" alignment="TOP_CENTER" spacing="5">
-                <Label fx:id="timerLabel" styleClass="timer-label" alignment="CENTER" text="00:00:00"/>
+            <HBox alignment="TOP_CENTER" prefHeight="49" spacing="5">
+                <Label fx:id="timerLabel" alignment="CENTER" styleClass="timer-label" text="00:00:00" />
             </HBox>
         </VBox>
     </AnchorPane>
@@ -47,18 +45,15 @@
                     AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
                     AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <top>
-                <VBox alignment="CENTER">
-                    <HBox prefHeight="35" maxHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="BOTTOM_CENTER">
-                    <Label fx:id="androidVersionLabel" alignment="CENTER"/>
-                    <Label fx:id="softwareVersionLabel" alignment="CENTER"/>
+                <VBox alignment="CENTER_LEFT">
+                    <HBox maxHeight="35" prefHeight="35" spacing="10" styleClass="left-hboxFirstInsideSecond">
                     </HBox>
-                    <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="CENTER">
+                    <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond">
                     <TextArea fx:id="gatActivityTextArea" editable="false"
-                              wrapText="true"
-                              prefHeight="25"
-                        maxHeight="25"
-                        minHeight="25"
-                        styleClass="activity-text-area"/>
+                              maxHeight="25" minHeight="25"
+                              prefHeight="25" prefWidth="800"
+                              styleClass="activity-text-area"
+                              wrapText="true" />
                     </HBox>
                 </VBox>
             </top>
@@ -69,8 +64,78 @@
                          rotateGraphic="true" styleClass="hidden-tabs"
                          BorderPane.alignment="CENTER">
                     <Tab fx:id="deviceTab" text="信息">
-                        <StackPane>
-                            <Label fx:id="deviceTabInside" style="-fx-font-size: 16px; -fx-text-fill: #2c3e50;" />
+                    <StackPane>
+                     <VBox spacing="10">
+                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                             <Region prefWidth="0" />
+                             <Label text="设备型号"/>
+                             <TextArea fx:id="gatDeviceModelTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                             <Label text="版本类型"/>
+                             <TextArea fx:id="gatDeviceBuildTypeTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                         </HBox>
+                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                             <Region prefWidth="0" />
+                             <Label text="版本日期"/>
+                             <TextArea fx:id="gatDeviceBuildDateTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                             <Label text="安卓版本"/>
+                             <TextArea fx:id="gatAndroidVersionTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                         </HBox>
+                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                             <Region prefWidth="0" />
+                             <Label text="DPI        "/>
+                             <TextArea fx:id="gatDeviceDpiTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                             <Label text="分辨率   "/>
+                             <TextArea fx:id="gatDeviceDisplaySizeTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                         </HBox>
+                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                             <Region prefWidth="0" />
+                             <Label text="RAM        "/>
+                             <TextArea fx:id="gatDeviceRamTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="193"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                             <Label text="ROM        "/>
+                             <TextArea fx:id="gatDeviceRomTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="200"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                         </HBox>
+                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                             <Region prefWidth="0" />
+                             <Label text="版本号   "/>
+                             <TextArea fx:id="gatDeviceBuildVersionTextArea" editable="false"
+                                       maxHeight="25" minHeight="25"
+                                       prefHeight="25" prefWidth="400"
+                                       styleClass="tabsHbox-text-area"
+                                       wrapText="true" />
+                         </HBox>
+                     </VBox>
                         </StackPane>
                     </Tab>
                 </TabPane>

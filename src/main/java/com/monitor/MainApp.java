@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -32,6 +33,7 @@ public class MainApp extends Application {
 
         primaryStage.setMinWidth(950);
         primaryStage.setMinHeight(620);
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/connected_1024x1024.png")));
         primaryStage.setTitle("MTK Monitor V1.0");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);

@@ -2,6 +2,7 @@ package com.monitor.controller;
 
 import com.monitor.utils.DeviceInfoUtil;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,14 +12,17 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.SplitPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -34,11 +38,6 @@ import javafx.util.Duration;
 public class DeviceInfoController implements Initializable{
     @FXML
     private Canvas statusCanvas;
-    @FXML
-    private HBox cpuFrequenciesBox;
-
-    @FXML
-    private Button powerHalButton;
 
     @FXML
     private SplitPane splitPane;
@@ -50,20 +49,30 @@ public class DeviceInfoController implements Initializable{
     private TabPane tabPane;
 
     @FXML
-    private Label deviceBuildVersionLabel,
-            deviceBuildTypeLabel,
-            deviceTabInside,
-            deviceStatusLabel,
-            deviceModelLabel,
-            timerLabel,
-            softwareVersionLabel,
-            androidVersionLabel;
+    private Label deviceStatusLabel,
+            timerLabel;
 
-    private Timeline timerTimeline;
-    private long startTime;
+    @FXML
+    private TextArea gatActivityTextArea,
+            gatAndroidVersionTextArea,
+            gatDeviceModelTextArea,
+            gatDeviceBuildTypeTextArea,
+            gatDeviceBuildDateTextArea,
+            gatDeviceBuildVersionTextArea,
+            gatDeviceDpiTextArea,
+            gatDeviceDisplaySizeTextArea,
+            gatDeviceRamTextArea,
+            gatDeviceRomTextArea;
 
     @FXML
     private Tab deviceTab;
+
+    @FXML
+    private ImageView statusIcon;
+
+    private Timeline timerTimeline;
+
+    private long startTime;
 
     private Tab cpuTab,
             gpuTab,
@@ -73,37 +82,21 @@ public class DeviceInfoController implements Initializable{
             spdTab,
             settingsTab;
 
-    @FXML
-    private TextArea gatActivityTextArea;
-
-    @FXML
-    private ToggleGroup serviceModeGroup;
-
     private Timeline statusCheckTimeline;
 
+    private static final double DEFAULT_DIVIDER_POSITION = 0.15;
+
+    private final Image connectedImage = new Image(getClass().getResourceAsStream("/images/connected_2048x2048.png"));
+    private final Image disconnectedImage = new Image(getClass().getResourceAsStream("/images/disconnected.png"));
 
     /**
-    状态变量，true表示当前是关闭状态
-    */
-    private boolean isPowerHalDisabled = true;
-
-    // private void togglePowerHal() {
-    //      if (isPowerHalDisabled) {
-    //          // 如果当前是关闭状态，执行开启操作
-    //          SpecialFunctionUtil.setPowerHalState(1, powerHalStatus);
-    //          powerHalButton.setText("开启PowerHal");
-    //      } else {
-    //          // 如果当前是开启状态，执行关闭操作
-    //          SpecialFunctionUtil.setPowerHalState(0, powerHalStatus);
-    //          powerHalButton.setText("关闭PowerHal");
-    //      }
-    //      isPowerHalDisabled = !isPowerHalDisabled;
-    //  }
-
-
-    private final ObservableList<Label> frequencyLabels = FXCollections.observableArrayList();
-
-    private static final int NUM_OF_CORE = 16;
+     * 用于记录设备信息控制器中的日志信息。
+     * <p>
+     * 该日志记录器用于捕捉和记录异常、错误以及其他重要的运行时信息，
+     * 有助于调试和监控应用程序的运行状态。
+     * </p>
+     */
+    private static final Logger logger = Logger.getLogger(DeviceInfoController.class.getName());
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -116,13 +109,11 @@ public class DeviceInfoController implements Initializable{
         tabPane.setTabMaxHeight(0);
         tabPane.setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0;");
 
-        deviceTabInside.setText("设备信息监控页面\n（功能待实现）");
-
         setupStatusChecker();
         setupListViewAnimation();
 
         // 设置ListView的单元格工厂，使文本居中
-        menuListView.setCellFactory(lv -> new ListCell<String>() {
+        menuListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -132,7 +123,7 @@ public class DeviceInfoController implements Initializable{
                 } else {
                     setText(item);
                     setAlignment(Pos.CENTER); // 文本居中
-                    setStyle("-fx-font-size: 14px; -fx-padding: 10px;"); // 设置字体大小和内边距
+                    setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
                 }
             }
         });
@@ -155,7 +146,7 @@ public class DeviceInfoController implements Initializable{
         menuListView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue != null) {
-                        showTab(newValue, newValue);
+                        showTab(newValue);
                     }
                 });
 
@@ -184,7 +175,12 @@ public class DeviceInfoController implements Initializable{
 
         // 绘制圆形指示灯
         gc.setFill(isConnected ? Color.LIGHTGREEN : Color.WHITE);
-        gc.fillOval(2, 2, 18, 18); // 留2px边距
+        gc.fillOval(2, 2, 18, 18);
+
+        Platform.runLater(() -> {
+            statusIcon.setImage(isConnected ? connectedImage : disconnectedImage);
+            statusIcon.setOpacity(isConnected ? 1.0 : 0.6);
+        });
 
         if(isConnected){
             deviceStatusLabel.setText("已连接");
@@ -192,7 +188,7 @@ public class DeviceInfoController implements Initializable{
                 startTime = System.currentTimeMillis();
                 timerTimeline.play();
             }
-        }else if(!isConnected){
+        }else{
             deviceStatusLabel.setText("未连接");
             timerTimeline.stop();
             timerLabel.setText("00:00:00");
@@ -200,97 +196,41 @@ public class DeviceInfoController implements Initializable{
 
         updateDeviceNameAndType();
         updateSoftWare();
-        // 可选：添加边框
-//        gc.setStroke(Color.BLACK);
-//        gc.strokeOval(1, 1, 20, 20);
     }
 
     private void updateDeviceNameAndType() {
         boolean isConnected = DeviceInfoUtil.isDeviceConnected();
         if(isConnected){
-            DeviceInfoUtil.getDeviceModel(deviceModelLabel);
-            DeviceInfoUtil.getDeviceBuildVersion(deviceBuildVersionLabel);
-            DeviceInfoUtil.getDeviceBuildType(deviceBuildTypeLabel);
+            DeviceInfoUtil.getDeviceModel(gatDeviceModelTextArea);
+            DeviceInfoUtil.getDeviceBuildVersion(gatDeviceBuildDateTextArea);
+            DeviceInfoUtil.getDeviceBuildType(gatDeviceBuildTypeTextArea);
+            DeviceInfoUtil.getDisplaySize(gatDeviceDisplaySizeTextArea);
         }else {
-            deviceModelLabel.setText("");
-            deviceBuildVersionLabel.setText("");
-            deviceBuildTypeLabel.setText("");
+            gatDeviceModelTextArea.setText("请插入设备");
+            gatDeviceBuildDateTextArea.setText("");
+            gatDeviceBuildTypeTextArea.setText("");
+            gatDeviceDisplaySizeTextArea.setText("");
         }
     }
 
     private void updateSoftWare() {
         boolean isConnected = DeviceInfoUtil.isDeviceConnected();
         if(isConnected){
-            DeviceInfoUtil.getAndroidVersion(androidVersionLabel);
-            DeviceInfoUtil.getDeviceSoftwareVersion(softwareVersionLabel);
+            DeviceInfoUtil.getAndroidVersion(gatAndroidVersionTextArea);
+            DeviceInfoUtil.getDeviceSoftwareVersion(gatDeviceBuildVersionTextArea);
             DeviceInfoUtil.getActivity(gatActivityTextArea);
+            DeviceInfoUtil.getDpi(gatDeviceDpiTextArea);
         }else {
-            androidVersionLabel.setText("");
-            softwareVersionLabel.setText("");
+            gatAndroidVersionTextArea.setText("");
+            gatDeviceBuildVersionTextArea.setText("");
             gatActivityTextArea.setText("");
+            gatDeviceDpiTextArea.setText("");
         }
     }
 
-    // private void initFrequencyLabels() {
-    //     // 横向间距
-    //     cpuFrequenciesBox.getChildren().clear();
-    //     cpuFrequenciesBox.setSpacing(2);
-    //
-    //     for (int i = 0; i < NUM_OF_CORE; i++) {
-    //         Label label = new Label();
-    //         // 简化样式
-    //         label.setStyle("-fx-font-family: monospace;");
-    //         label.setVisible(false);
-    //         frequencyLabels.add(label);
-    //     }
-    //     cpuFrequenciesBox.getChildren().addAll(frequencyLabels);
-    // }
-
-
-    // @FXML
-    // private void brightnessSetDefault() {
-    //     AdbUtil.setScreenBrightness(102, resultLabel);
-    // }
-
-    // @Override
-    // public void onStatusUpdate(boolean isConnected, List<String> cpuFrequencies) {
-        // Platform.runLater(() -> {
-        //     // 更新设备状态灯
-        //     drawStatusLight(isConnected);
-        //
-        //     updateStatusMessage(isConnected);
-        //
-        //     updateDeviceInfo();
-        //
-        //     // 优化：减少频繁的可见性和管理性切换
-        //     for (int i = 0; i < frequencyLabels.size(); i++) {
-        //         Label label = frequencyLabels.get(i);
-        //
-        //         // 如果频率数据已改变，更新文本
-        //         if (i < cpuFrequencies.size()) {
-        //             String newFrequency = cpuFrequencies.get(i);
-        //             if (!newFrequency.equals(label.getText())) {
-        //                 label.setText(newFrequency);
-        //             }
-        //
-        //             // 只需要设置可见性一次，避免频繁切换
-        //             if (!label.isVisible()) {
-        //                 label.setVisible(true);
-        //                 label.setManaged(true);
-        //             }
-        //         } else {
-        //             // 没有频率数据时，隐藏标签
-        //             if (label.isVisible()) {
-        //                 label.setVisible(false);
-        //                 label.setManaged(false);
-        //             }
-        //         }
-        //     }
-        // });
-    // }
     private void setupListViewAnimation() {
         // 自定义单元格工厂
-        menuListView.setCellFactory(lv -> new ListCell<String>() {
+        menuListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -336,7 +276,7 @@ public class DeviceInfoController implements Initializable{
         });
     }
 
-    private void showTab(String tabType, String tabTitle) {
+    private void showTab(String tabType) {
         Tab targetTab = null;
 
         switch (tabType) {
@@ -388,6 +328,10 @@ public class DeviceInfoController implements Initializable{
                 }
                 targetTab = settingsTab;
                 break;
+            default:
+                // 这里可以添加默认的处理逻辑
+                System.out.println("Unexpected tab title:");
+                break;
         }
 
         if (targetTab != null) {
@@ -403,7 +347,7 @@ public class DeviceInfoController implements Initializable{
             Parent content = loader.load();
             Tab newTab = new Tab(title);
             newTab.setContent(content);
-            newTab.setClosable(true); // 允许关闭
+            newTab.setClosable(true);
 
             // Tab关闭时重置对应变量
             newTab.setOnClosed(event -> {
@@ -415,25 +359,26 @@ public class DeviceInfoController implements Initializable{
                     case "解锁": deviceUnlockTab = null; break;
                     case "Spd": spdTab = null; break;
                     case "设置": settingsTab = null; break;
+                    default:
+                        // 这里可以添加默认的处理逻辑
+                        System.out.println("Unexpected tab title: " + title);
+                        break;
                 }
             });
             return newTab;
         } catch (IOException e) {
-            e.printStackTrace();
+            // 通过 logger 记录异常
+            logger.log(Level.SEVERE, "Failed to load FXML for tab: " + title, e);
             return new Tab(title + " (加载失败)");
         }
     }
 
-
-
-    // 在 initialize 方法中初始化计时器
     private void initTimer() {
         timerLabel.setText("00:00:00");
         timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateTimer()));
         timerTimeline.setCycleCount(Timeline.INDEFINITE);
     }
 
-    // 更新计时器显示
     private void updateTimer() {
         long elapsedTime = System.currentTimeMillis() - startTime;
         long seconds = (elapsedTime / 1000) % 60;
@@ -448,7 +393,7 @@ public class DeviceInfoController implements Initializable{
         // 获取FXML文件中的SplitPane
         if (splitPane != null) {
             splitPane.getDividers().get(0).positionProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal.doubleValue() != 0.15) {
+                if (newVal.doubleValue() != DEFAULT_DIVIDER_POSITION) {
                     splitPane.setDividerPosition(0, 0.15);
                 }
             });
@@ -459,6 +404,8 @@ public class DeviceInfoController implements Initializable{
         if (statusCheckTimeline != null) {
             statusCheckTimeline.stop();
         }
+
+        DeviceInfoUtil.shutdownExecutor();
     }
 }
 

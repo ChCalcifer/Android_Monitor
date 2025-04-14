@@ -17,6 +17,7 @@ public class CustomThreadFactory implements ThreadFactory {
     *线程名前缀
      */
     private final String namePrefix;
+
     private final AtomicInteger threadCounter = new AtomicInteger(1);
 
     public CustomThreadFactory(String poolName) {
