@@ -34,11 +34,35 @@ public class DeviceInfoUtil {
     private static final String ADB_PATH = "adb";
 
     /**
+     * 电池信息基础路径
+     */
+    private static String batteryBasePath = null;
+
+    private static final Object batteryPathLock = new Object();
+
+    /**
+     * 候选电池路径列表（按优先级排序）
+     */
+    private static final String[] BATTERY_PATH_CANDIDATES = {
+            "/sys/class/power_supply/battery",
+            "/sys/devices/platform/charger-manager/power_supply/battery",
+            "/sys/devices/qpnp-charger-*/power_supply/battery"
+    };
+
+    /**
      * 定位屏幕尺寸。
      */
     private static final Pattern DISPLAY_SIZE_PATTERN = Pattern.compile("(\\d+)x(\\d+)");
 
     private static final Pattern DENSITY_PATTERN = Pattern.compile("Physical density: (\\d+)");
+
+    private static final Pattern RAM_PATTERN = Pattern.compile(
+            "MemTotal:\\s+(\\d+)\\s+kB.*MemAvailable:\\s+(\\d+)\\s+kB",
+            Pattern.DOTALL
+    );
+
+    private static final Pattern ROM_PATTERN = Pattern.compile("^(\\S+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+\\d+%\\s+(/data|/storage/emulated/0).*");
+
 
     /**
      * 异步线程池。
@@ -55,10 +79,18 @@ public class DeviceInfoUtil {
     public static boolean isDeviceConnected() {
         try {
             String output = executeCommand(ADB_PATH + " devices");
-            // 检查输出中是否包含设备 ID，判断设备是否连接
-            return output.contains("\tdevice");
+            boolean connected = output.contains("\tdevice");
+
+            // 新增逻辑：连接状态变化时触发预加载
+            if (connected && batteryBasePath == null) {
+                preloadBatteryPath(); // 设备首次连接时触发
+            } else if (!connected) {
+                onDeviceDisconnected(); // 设备断开时重置路径
+            }
+
+            return connected;
         } catch (Exception e) {
-            // 捕获异常时返回 false，表示设备未连接
+            onDeviceDisconnected(); // 异常时也重置路径
             return false;
         }
     }
@@ -66,25 +98,25 @@ public class DeviceInfoUtil {
     /**
      * 设备型号 获取设备型号并显示。
      */
-    public static void getDeviceModel(TextArea gatDeviceModelTextArea) {
+    public static void getDeviceModel(TextArea getDeviceModelTextArea) {
         // 使用线程池来执行任务
         executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.product.model",
-                gatDeviceModelTextArea, "");
+                getDeviceModelTextArea, "");
     }
 
     /**
      * 设备型号 获取设备生产版本型号。
      */
-    public static void getDeviceBuildVersion(TextArea gatDeviceBuildDateTextArea) {
+    public static void getDeviceBuildVersion(TextArea getDeviceBuildDateTextArea) {
         // 使用线程池来执行任务
         executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.version.incremental",
-                gatDeviceBuildDateTextArea, "");
+                getDeviceBuildDateTextArea, "");
     }
 
     /**
      * 设备型号 获取设备生产版本型号。
      */
-    public static void getDeviceBuildType(TextArea gatDeviceBuildTypeTextArea) {
+    public static void getDeviceBuildType(TextArea getDeviceBuildTypeTextArea) {
         // 使用线程池来执行任务
         executorService.submit(() -> {
             String result = "";
@@ -109,37 +141,37 @@ public class DeviceInfoUtil {
                     }
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> gatDeviceBuildTypeTextArea.setText(""));
+                Platform.runLater(() -> getDeviceBuildTypeTextArea.setText(""));
             }
             final String finalResult = result; // 创建最终的变量
-            Platform.runLater(() -> gatDeviceBuildTypeTextArea.setText(finalResult));
+            Platform.runLater(() -> getDeviceBuildTypeTextArea.setText(finalResult));
         });
     }
 
     /**
      * 软件版本 获取软件版本。
      */
-    public static void getDeviceSoftwareVersion(TextArea gatDeviceBuildVersionTextArea) {
+    public static void getDeviceSoftwareVersion(TextArea getDeviceBuildVersionTextArea) {
         executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.display.id",
-                gatDeviceBuildVersionTextArea, "Unknown");
+                getDeviceBuildVersionTextArea, "Unknown");
     }
 
     /**
      * 安卓版本 获取安卓版本。
      */
-    public static void getAndroidVersion(TextArea gatAndroidVersionTextArea) {
+    public static void getAndroidVersion(TextArea getAndroidVersionTextArea) {
         executorService.submit(() -> {
             try {
                 // 执行命令获取设备型号
                 String output = executeCommand(ADB_PATH + " shell getprop ro.build.version.release");
                 if (output != null && !output.isEmpty()) {
                     // 在 JavaFX 应用程序线程中更新 UI 标签
-                    Platform.runLater(() -> gatAndroidVersionTextArea.setText(output.trim()));
+                    Platform.runLater(() -> getAndroidVersionTextArea.setText(output.trim()));
                 } else {
-                    Platform.runLater(() -> gatAndroidVersionTextArea.setText("Unknown"));
+                    Platform.runLater(() -> getAndroidVersionTextArea.setText("Unknown"));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> gatAndroidVersionTextArea.setText("None"));
+                Platform.runLater(() -> getAndroidVersionTextArea.setText("None"));
             }
         });
     }
@@ -147,7 +179,7 @@ public class DeviceInfoUtil {
     /**
      * dpi 获取dpi。
      */
-    public static void getDpi(TextArea gatDeviceDpiTextArea) {
+    public static void getDpi(TextArea getDeviceDpiTextArea) {
         executorService.submit(() -> {
             try {
                 // 执行命令获取设备DPI
@@ -156,10 +188,10 @@ public class DeviceInfoUtil {
                 String deviceDensity = parseDensity(output);
 
                 Platform.runLater(() -> {
-                    gatDeviceDpiTextArea.setText(Objects.requireNonNullElse(deviceDensity, "Unknown"));
+                    getDeviceDpiTextArea.setText(Objects.requireNonNullElse(deviceDensity, "Unknown"));
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> gatDeviceDpiTextArea.setText("error"));
+                Platform.runLater(() -> getDeviceDpiTextArea.setText("error"));
             }
         });
     }
@@ -182,7 +214,7 @@ public class DeviceInfoUtil {
     /**
      * Activity 获取并更新Activity。
      */
-    public static void getActivity(TextArea gatActivityTextArea) {
+    public static void getActivity(TextArea getActivityTextArea) {
         executorService.submit(() -> {
             try {
                 String output = executeCommand(ADB_PATH + " shell \"dumpsys activity top | grep ACTIVITY | tail -n 1\"");
@@ -193,33 +225,33 @@ public class DeviceInfoUtil {
                     if (matcher.find()) {
                         String newActivity = matcher.group(1); // 提取匹配的包名/类名
                         Platform.runLater(() -> {
-                            String currentText = gatActivityTextArea.getText();
+                            String currentText = getActivityTextArea.getText();
                             // 仅在新值不同时更新
                             if (!newActivity.equals(currentText)) {
-                                gatActivityTextArea.setText(newActivity);
+                                getActivityTextArea.setText(newActivity);
                             }
                         });
                     } else {
                         Platform.runLater(() -> {
-                            String currentText = gatActivityTextArea.getText();
+                            String currentText = getActivityTextArea.getText();
                             if (!"Unknown".equals(currentText)) {
-                                gatActivityTextArea.setText("Unknown");
+                                getActivityTextArea.setText("Unknown");
                             }
                         });
                     }
                 } else {
                     Platform.runLater(() -> {
-                        String currentText = gatActivityTextArea.getText();
+                        String currentText = getActivityTextArea.getText();
                         if (!"Unknown".equals(currentText)) {
-                            gatActivityTextArea.setText("Unknown");
+                            getActivityTextArea.setText("Unknown");
                         }
                     });
                 }
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    String currentText = gatActivityTextArea.getText();
+                    String currentText = getActivityTextArea.getText();
                     if (!"None".equals(currentText)) {
-                        gatActivityTextArea.setText("None");
+                        getActivityTextArea.setText("None");
                     }
                 });
             }
@@ -229,7 +261,7 @@ public class DeviceInfoUtil {
     /**
      * 屏幕尺寸 获取屏幕尺寸。
      */
-    public static void getDisplaySize(TextArea gatDeviceDisplaySizeTextArea) {
+    public static void getDisplaySize(TextArea getDeviceDisplaySizeTextArea) {
         executorService.submit(() -> {
             try {
                 // 执行命令获取设备型号
@@ -239,10 +271,10 @@ public class DeviceInfoUtil {
 
                 Platform.runLater(() -> {
                     // 使用 Objects.requireNonNullElse 来替代 if 语句
-                    gatDeviceDisplaySizeTextArea.setText(Objects.requireNonNullElse(deviceDisplaySize, "Unknown"));
+                    getDeviceDisplaySizeTextArea.setText(Objects.requireNonNullElse(deviceDisplaySize, "Unknown"));
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> gatDeviceDisplaySizeTextArea.setText("error"));
+                Platform.runLater(() -> getDeviceDisplaySizeTextArea.setText("error"));
             }
         });
     }
@@ -263,6 +295,255 @@ public class DeviceInfoUtil {
             return null;
         }
 
+    }
+
+    /**
+     * 获取设备 ROM 信息
+     */
+    public static void getDeviceRom(TextArea getDeviceRomTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell df /data");
+                String romInfo = parseRomInfo(output);
+                Platform.runLater(() -> {
+                    getDeviceRomTextArea.setText(Objects.requireNonNullElse(romInfo, "Unknown"));
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> getDeviceRomTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 解析 ROM 信息（总空间、已用、可用）
+     */
+    public static String parseRomInfo(String output) {
+        String[] lines = output.split("\n");
+        for (String line : lines) {
+            Matcher matcher = ROM_PATTERN.matcher(line);
+            if (matcher.find()) {
+                long totalBlocks = Long.parseLong(matcher.group(2));
+                long usedBlocks = Long.parseLong(matcher.group(3));
+                long freeBlocks = Long.parseLong(matcher.group(4));
+                // 转换为 GB，并取整
+                long totalGB = (long) Math.floor(totalBlocks / 1024.0 / 1024.0);
+                long usedGB = (long) Math.floor(usedBlocks / 1024.0 / 1024.0);
+                long freeGB = (long) Math.floor(freeBlocks / 1024.0 / 1024.0);
+                return "总:" + totalGB + "GB   " + "已用:" + usedGB +  "GB   " + "可用:" + freeGB + "GB";
+            }
+        }
+        return "Unknown";
+    }
+
+    /**
+     * 获取设备 RAM 信息
+     */
+    public static void getDeviceRam(TextArea getDeviceRamTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell cat /proc/meminfo");
+                String ramInfo = parseRamInfo(output);
+                Platform.runLater(() -> {
+                    getDeviceRamTextArea.setText(Objects.requireNonNullElse(ramInfo, "Unknown"));
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> getDeviceRamTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 解析 RAM 信息（总内存和可用内存）
+     */
+    public static String parseRamInfo(String output) {
+        Matcher matcher = RAM_PATTERN.matcher(output);
+
+        if (matcher.find()) {
+            // 获取总内存和可用内存（单位：KB）
+            long totalKB = Long.parseLong(matcher.group(1));
+            long availableKB = Long.parseLong(matcher.group(2));
+
+            // 将内存从 KB 转换为 GB，使用 Math.round() 进行四舍五入
+            long totalGB = Math.round(totalKB / 1024.0 / 1024.0);
+            long availableGB = Math.round(availableKB / 1024.0 / 1024.0);
+
+            // 返回结果（总内存和可用内存）
+            return "总: " + totalGB + " GB   可用: " + availableGB + " GB";
+        }
+
+        return "Unknown";
+    }
+
+    /**
+     * 电池电量 获取电池电量。
+     */
+    public static void getBatteryCapacity(TextArea getBatteryCapacityTextArea) {
+        getBatteryInfo("capacity", getBatteryCapacityTextArea, "Unknown");
+    }
+
+    /**
+     * 电池容量 获取电池容量。
+     */
+    public static void getBatterySize(TextArea getBatterySizeTextArea) {
+        getBatteryInfo("charge_full_design", getBatterySizeTextArea, "Unknown");
+    }
+
+    /**
+     * 当前电流 获取当前电流。
+     */
+    public static void getBatteryCurrentNow(TextArea getCurrentNowTextArea) {
+        getBatteryInfo("current_now", getCurrentNowTextArea, "Unknown");
+    }
+
+    /**
+     * 平均电流 获取平均电流。
+     */
+    public static void getBatteryCurrentAvg(TextArea getCurrentAvgTextArea) {
+        getBatteryInfo("current_avg", getCurrentAvgTextArea, "Unknown");
+    }
+
+    /**
+     * 当前电压 获取当前电压。
+     */
+    public static void getBatteryVoltageNow(TextArea getVoltageNowTextArea) {
+        getBatteryInfo("voltage_now", getVoltageNowTextArea, "Unknown");
+    }
+
+    /**
+     * 平均电压 获取平均电压。
+     */
+    public static void getBatteryVoltageAvg(TextArea getVoltageAvgTextArea) {
+        getBatteryInfo("voltage_avg", getVoltageAvgTextArea, "Unknown");
+    }
+
+    /**
+     * 电池健康 获取电池健康。
+     */
+    public static void getBatteryHealth(TextArea getBatteryHealthTextArea) {
+        getBatteryInfo("health", getBatteryHealthTextArea, "Unknown");
+    }
+
+    /**
+     * 充电状态 获取充电状态。
+     */
+    public static void getBatteryStatus(TextArea getBatteryStatusTextArea) {
+        getBatteryInfo("status", getBatteryStatusTextArea, "Unknown");
+    }
+
+    /**
+     * 充电温度 获取充电温度。
+     */
+    public static void getBatteryTemp(TextArea getBatteryTempTextArea) {
+        getBatteryInfo("temp", getBatteryTempTextArea, "Unknown");
+    }
+
+    /**
+     * 环境温度 获取环境温度。
+     */
+    public static void getBatteryTempAmbient(TextArea getBatteryTempAmbientTextArea) {
+        getBatteryInfo("temp_ambient", getBatteryTempAmbientTextArea, "Unknown");
+    }
+
+    /**
+     * 电池材质 获取电池材质。
+     */
+    public static void getBatteryTechnology(TextArea getBatteryTechnologyTextArea) {
+        getBatteryInfo("technology", getBatteryTechnologyTextArea, "Unknown");
+    }
+
+    /**
+     * 充满时间 获取充满时间。
+     */
+    public static void getBatteryTimeFullToNow(TextArea getBatteryTimeFullToNowTextArea) {
+        getBatteryInfo("time_to_full_now", getBatteryTimeFullToNowTextArea, "Unknown");
+    }
+
+    /**
+     * 连接类型 获取连接类型。
+     */
+    public static void getBatteryUsbType(TextArea getBatteryUsbTypeTextArea) {
+        getBatteryInfo("usb_type", getBatteryUsbTypeTextArea, "Unknown");
+    }
+
+    /**
+     * 动态检测电池路径（线程安全）
+     */
+    private static synchronized void detectBatteryPath() throws IOException {
+        if (batteryBasePath != null) return;
+
+        for (String path : BATTERY_PATH_CANDIDATES) {
+            // 检查路径是否存在且包含关键文件
+            String checkCmd = String.format(
+                    "shell \"if [ -d %s ] && [ -f %s/capacity ]; then echo exists; fi\"",
+                    path, path
+            );
+
+            try {
+                String output = executeCommand(ADB_PATH + " " + checkCmd);
+                if (output != null && output.contains("exists")) {
+                    batteryBasePath = path;
+                    return;
+                }
+            } catch (IOException e) {
+                // 忽略当前路径的检测异常
+                continue;
+            }
+        }
+
+        throw new IOException("无法检测到电池路径");
+    }
+
+    /**
+     * 当检测到设备断开或重新连接时
+     */
+    public static void onDeviceDisconnected() {
+        synchronized (batteryPathLock) {
+            batteryBasePath = null;
+        }
+    }
+
+    /**
+     * 获取电池信息通用方法
+     */
+    private static void getBatteryInfo(String file, TextArea textArea, String defaultValue) {
+        executorService.submit(() -> {
+            try {
+                ensureBatteryPathInitialized();
+                String command = String.format("%s shell cat %s/%s",
+                        ADB_PATH, batteryBasePath, file);
+                String output = executeCommand(command);
+                String result = (output != null && !output.isEmpty()) ? output.trim() : defaultValue;
+                Platform.runLater(() -> textArea.setText(result));
+            } catch (Exception e) {
+                Platform.runLater(() -> textArea.setText("无"));
+            }
+        });
+    }
+
+    /**
+     * 异步预加载路径（减少首次延迟）
+     */
+    public static void preloadBatteryPath() {
+        executorService.submit(() -> {
+            try {
+                ensureBatteryPathInitialized();
+            } catch (IOException e) {
+                // 记录日志或处理异常
+            }
+        });
+    }
+
+    /**
+     * 确保电池路径已初始化
+     */
+    private static synchronized void ensureBatteryPathInitialized() throws IOException {
+        if (batteryBasePath == null) {
+            synchronized (batteryPathLock) {
+                if (batteryBasePath == null) { // 双重检查锁定
+                    detectBatteryPath();
+                }
+            }
+        }
     }
 
     /**

@@ -9,12 +9,12 @@ import javafx.scene.control.Label;
  * @Version 1.0.0
  */
 
-public class DisplayInfoController {
+public class MemoryInfoController {
     @FXML
     private Label displayStatusLabel;
 
     @FXML
     private void initialize() {
-        displayStatusLabel.setText("显示信息监控页面\n（功能待实现）");
+        displayStatusLabel.setText("Memory信息监控页面\n（功能待实现）");
     }
 }

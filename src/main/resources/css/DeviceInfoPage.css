@@ -218,3 +218,24 @@
     -fx-border-width: 0;  /* 去除滚动区域的边框 */
 }
 
+.titled-pane {
+    -fx-background-color: white;
+}
+
+/* 设置标题栏背景 */
+
+/* 设置内容区域背景并移除边框 */
+.titled-pane > .content {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+}
+
+/*.scroll-pane {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: transparent;*/
+/*}*/
+
+/* 如果需要，还可以设置 viewport 的背景颜色 */
+.scroll-pane .viewport {
+    -fx-background-color: white;
+}

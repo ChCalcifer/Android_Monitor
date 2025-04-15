@@ -15,6 +15,8 @@
 
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ScrollPane?>
 <SplitPane fx:id="splitPane" dividerPositions="0.15"
            maxHeight="-Infinity" maxWidth="-Infinity"
            minHeight="-Infinity" minWidth="-Infinity"
@@ -48,8 +50,8 @@
                 <VBox alignment="CENTER_LEFT">
                     <HBox maxHeight="35" prefHeight="35" spacing="10" styleClass="left-hboxFirstInsideSecond">
                     </HBox>
-                    <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond">
-                    <TextArea fx:id="gatActivityTextArea" editable="false"
+                    <HBox prefHeight="35" styleClass="left-hboxFirstInsideSecond" alignment="BOTTOM_LEFT">
+                    <TextArea fx:id="getActivityTextArea" editable="false"
                               maxHeight="25" minHeight="25"
                               prefHeight="25" prefWidth="800"
                               styleClass="activity-text-area"
@@ -64,79 +66,262 @@
                          rotateGraphic="true" styleClass="hidden-tabs"
                          BorderPane.alignment="CENTER">
                     <Tab fx:id="deviceTab" text="信息">
-                    <StackPane>
-                     <VBox spacing="10">
-                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                    <ScrollPane fitToWidth="true">
+                     <VBox spacing="10" maxWidth="Infinity" fillWidth="true">
+                         <TitledPane text="基本信息" animated="true" expanded="true">
+                         <VBox maxWidth="Infinity" fillWidth="true">
+                         <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                              <Region prefWidth="0" />
                              <Label text="设备型号"/>
-                             <TextArea fx:id="gatDeviceModelTextArea" editable="false"
+                             <TextArea fx:id="getDeviceModelTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
                                        prefHeight="25" prefWidth="200"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
                              <Label text="版本类型"/>
-                             <TextArea fx:id="gatDeviceBuildTypeTextArea" editable="false"
+                             <TextArea fx:id="getDeviceBuildTypeTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
                                        prefHeight="25" prefWidth="200"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
                          </HBox>
-                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                         <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                              <Region prefWidth="0" />
                              <Label text="版本日期"/>
-                             <TextArea fx:id="gatDeviceBuildDateTextArea" editable="false"
+                             <TextArea fx:id="getDeviceBuildDateTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
                                        prefHeight="25" prefWidth="200"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
                              <Label text="安卓版本"/>
-                             <TextArea fx:id="gatAndroidVersionTextArea" editable="false"
+                             <TextArea fx:id="getAndroidVersionTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
                                        prefHeight="25" prefWidth="200"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
                          </HBox>
-                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                         <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                              <Region prefWidth="0" />
-                             <Label text="DPI        "/>
-                             <TextArea fx:id="gatDeviceDpiTextArea" editable="false"
+                             <Label text="RAM      "/>
+                             <TextArea fx:id="getDeviceRamTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
                                        prefHeight="25" prefWidth="200"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
-                             <Label text="分辨率   "/>
-                             <TextArea fx:id="gatDeviceDisplaySizeTextArea" editable="false"
+                             <Label text="ROM     "/>
+                             <TextArea fx:id="getDeviceRomTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
-                                       prefHeight="25" prefWidth="200"
+                                       prefHeight="25" prefWidth="240"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
                          </HBox>
-                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
-                             <Region prefWidth="0" />
-                             <Label text="RAM        "/>
-                             <TextArea fx:id="gatDeviceRamTextArea" editable="false"
-                                       maxHeight="25" minHeight="25"
-                                       prefHeight="25" prefWidth="193"
-                                       styleClass="tabsHbox-text-area"
-                                       wrapText="true" />
-                             <Label text="ROM        "/>
-                             <TextArea fx:id="gatDeviceRomTextArea" editable="false"
-                                       maxHeight="25" minHeight="25"
-                                       prefHeight="25" prefWidth="200"
-                                       styleClass="tabsHbox-text-area"
-                                       wrapText="true" />
-                         </HBox>
-                         <HBox prefHeight="75" spacing="50" alignment="CENTER_LEFT">
+                         <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                              <Region prefWidth="0" />
                              <Label text="版本号   "/>
-                             <TextArea fx:id="gatDeviceBuildVersionTextArea" editable="false"
+                             <TextArea fx:id="getDeviceBuildVersionTextArea" editable="false"
                                        maxHeight="25" minHeight="25"
                                        prefHeight="25" prefWidth="400"
                                        styleClass="tabsHbox-text-area"
                                        wrapText="true" />
                          </HBox>
+                        </VBox>
+                         </TitledPane>
+                         <TitledPane text="电池信息" animated="true">
+                             <VBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="电池容量"/>
+                                     <TextArea fx:id="getBatterySizeTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="当前电量"/>
+                                     <TextArea fx:id="getBatteryCapacityTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="当前电流"/>
+                                     <TextArea fx:id="getCurrentNowTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="平均电流"/>
+                                     <TextArea fx:id="getCurrentAvgTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="当前电压"/>
+                                     <TextArea fx:id="getVoltageNowTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="平均电压"/>
+                                     <TextArea fx:id="getVoltageAvgTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="电池健康"/>
+                                     <TextArea fx:id="getBatteryHealthTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="电池状态"/>
+                                     <TextArea fx:id="getBatteryStatusTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="电池温度"/>
+                                     <TextArea fx:id="getBatteryTempTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="环境温度"/>
+                                     <TextArea fx:id="getBatteryTempAmbientTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="电池材质"/>
+                                     <TextArea fx:id="getBatteryTechnologyTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="充满时间"/>
+                                     <TextArea fx:id="getBatteryTimeFullToNowTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="连接类型"/>
+                                     <TextArea fx:id="getBatteryUsbTypeTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="400"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                             </VBox>
+                         </TitledPane>
+                         <TitledPane text="屏幕信息" animated="true">
+                             <VBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="DPI        "/>
+                                     <TextArea fx:id="getDeviceDpiTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="分辨率   "/>
+                                     <TextArea fx:id="getDeviceDisplaySizeTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="DPI        "/>
+                                     <TextArea fx:id="getDeviceXDpiTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="分辨率   "/>
+                                     <TextArea fx:id="getDeviceYDpiTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="当前帧率"/>
+                                     <TextArea fx:id="getScreenFpsTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="FPS"/>
+                                     <TextArea fx:id="getScreenRefreshRateTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="纯白最高尼特"/>
+                                     <TextArea fx:id="getScreenWhiteNitTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                     <Label text="常规最高尼特"/>
+                                     <TextArea fx:id="getScreenNormalNitTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="刷新率挡位及相应数值"/>
+                                     <TextArea fx:id="getScreenBrightnessTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="200"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="尼特值分布"/>
+                                     <TextArea fx:id="getScreenNitLevelTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="400"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
+                                     <Region prefWidth="0" />
+                                     <Label text="光照强度分布"/>
+                                     <TextArea fx:id="getScreenLuxLevelTextArea" editable="false"
+                                               maxHeight="25" minHeight="25"
+                                               prefHeight="25" prefWidth="400"
+                                               styleClass="tabsHbox-text-area"
+                                               wrapText="true" />
+                                 </HBox>
+                             </VBox>
+                         </TitledPane>
                      </VBox>
-                        </StackPane>
+                     </ScrollPane>
                     </Tab>
                 </TabPane>
             </center>

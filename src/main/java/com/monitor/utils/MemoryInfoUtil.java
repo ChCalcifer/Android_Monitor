@@ -25,7 +25,7 @@ import static com.monitor.utils.DeviceInfoUtil.isDeviceConnected;
  * @Version 1.0.0
  */
 
-public class DisplayInfoUtil {
+public class MemoryInfoUtil {
 
     private static final String ADB_PATH = "adb";
 

@@ -53,16 +53,29 @@ public class DeviceInfoController implements Initializable{
             timerLabel;
 
     @FXML
-    private TextArea gatActivityTextArea,
-            gatAndroidVersionTextArea,
-            gatDeviceModelTextArea,
-            gatDeviceBuildTypeTextArea,
-            gatDeviceBuildDateTextArea,
-            gatDeviceBuildVersionTextArea,
-            gatDeviceDpiTextArea,
-            gatDeviceDisplaySizeTextArea,
-            gatDeviceRamTextArea,
-            gatDeviceRomTextArea;
+    private TextArea getActivityTextArea,
+            getAndroidVersionTextArea,
+            getDeviceModelTextArea,
+            getDeviceBuildTypeTextArea,
+            getDeviceBuildDateTextArea,
+            getDeviceBuildVersionTextArea,
+            getDeviceDpiTextArea,
+            getDeviceDisplaySizeTextArea,
+            getDeviceRamTextArea,
+            getDeviceRomTextArea,
+            getBatteryCapacityTextArea,
+            getBatterySizeTextArea,
+            getCurrentNowTextArea,
+            getCurrentAvgTextArea,
+            getVoltageNowTextArea,
+            getVoltageAvgTextArea,
+            getBatteryHealthTextArea,
+            getBatteryStatusTextArea,
+            getBatteryTempTextArea,
+            getBatteryTempAmbientTextArea,
+            getBatteryTechnologyTextArea,
+            getBatteryTimeFullToNowTextArea,
+            getBatteryUsbTypeTextArea;
 
     @FXML
     private Tab deviceTab;
@@ -76,7 +89,7 @@ public class DeviceInfoController implements Initializable{
 
     private Tab cpuTab,
             gpuTab,
-            displayTab,
+            memoryTab,
             specialFunctionTab,
             deviceUnlockTab,
             spdTab,
@@ -85,6 +98,8 @@ public class DeviceInfoController implements Initializable{
     private Timeline statusCheckTimeline;
 
     private static final double DEFAULT_DIVIDER_POSITION = 0.15;
+
+    private boolean previousConnected = false;
 
     private final Image connectedImage = new Image(getClass().getResourceAsStream("/images/connected_2048x2048.png"));
     private final Image disconnectedImage = new Image(getClass().getResourceAsStream("/images/disconnected.png"));
@@ -135,7 +150,7 @@ public class DeviceInfoController implements Initializable{
                 "信息",
                 "CPU",
                 "GPU",
-                "Disp",
+                "Mem",
                 "功能",
                 "解锁",
                 "Spd",
@@ -158,6 +173,10 @@ public class DeviceInfoController implements Initializable{
         menuListView.getSelectionModel().selectFirst();
 
         initTimer();
+
+        if (DeviceInfoUtil.isDeviceConnected()) {
+            DeviceInfoUtil.preloadBatteryPath();
+        }
     }
 
     private void setupStatusChecker() {
@@ -173,58 +192,103 @@ public class DeviceInfoController implements Initializable{
         GraphicsContext gc = statusCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, statusCanvas.getWidth(), statusCanvas.getHeight());
 
-        // 绘制圆形指示灯
+        // 绘制指示灯
         gc.setFill(isConnected ? Color.LIGHTGREEN : Color.WHITE);
         gc.fillOval(2, 2, 18, 18);
 
         Platform.runLater(() -> {
             statusIcon.setImage(isConnected ? connectedImage : disconnectedImage);
             statusIcon.setOpacity(isConnected ? 1.0 : 0.6);
+            deviceStatusLabel.setText(isConnected ? "已连接" : "未连接");
         });
 
-        if(isConnected){
-            deviceStatusLabel.setText("已连接");
+        // 仅在连接状态变化时执行更新
+        if (isConnected != previousConnected) {
+            updateDeviceNameAndType();
+            updateSoftWare();
+            previousConnected = isConnected;
+        }
+
+        // 计时器逻辑（保持不变）
+        if (isConnected) {
             if (!timerTimeline.getStatus().equals(Animation.Status.RUNNING)) {
                 startTime = System.currentTimeMillis();
                 timerTimeline.play();
             }
-        }else{
-            deviceStatusLabel.setText("未连接");
+        } else {
             timerTimeline.stop();
             timerLabel.setText("00:00:00");
         }
 
-        updateDeviceNameAndType();
-        updateSoftWare();
+        updateBatteryInfo();
     }
 
     private void updateDeviceNameAndType() {
         boolean isConnected = DeviceInfoUtil.isDeviceConnected();
         if(isConnected){
-            DeviceInfoUtil.getDeviceModel(gatDeviceModelTextArea);
-            DeviceInfoUtil.getDeviceBuildVersion(gatDeviceBuildDateTextArea);
-            DeviceInfoUtil.getDeviceBuildType(gatDeviceBuildTypeTextArea);
-            DeviceInfoUtil.getDisplaySize(gatDeviceDisplaySizeTextArea);
+            DeviceInfoUtil.getDeviceModel(getDeviceModelTextArea);
+            DeviceInfoUtil.getDeviceBuildVersion(getDeviceBuildDateTextArea);
+            DeviceInfoUtil.getDeviceBuildType(getDeviceBuildTypeTextArea);
+            DeviceInfoUtil.getDisplaySize(getDeviceDisplaySizeTextArea);
         }else {
-            gatDeviceModelTextArea.setText("请插入设备");
-            gatDeviceBuildDateTextArea.setText("");
-            gatDeviceBuildTypeTextArea.setText("");
-            gatDeviceDisplaySizeTextArea.setText("");
+            getDeviceModelTextArea.setText("");
+            getDeviceBuildDateTextArea.setText("");
+            getDeviceBuildTypeTextArea.setText("");
+            getDeviceDisplaySizeTextArea.setText("");
         }
     }
 
     private void updateSoftWare() {
         boolean isConnected = DeviceInfoUtil.isDeviceConnected();
         if(isConnected){
-            DeviceInfoUtil.getAndroidVersion(gatAndroidVersionTextArea);
-            DeviceInfoUtil.getDeviceSoftwareVersion(gatDeviceBuildVersionTextArea);
-            DeviceInfoUtil.getActivity(gatActivityTextArea);
-            DeviceInfoUtil.getDpi(gatDeviceDpiTextArea);
+            DeviceInfoUtil.getAndroidVersion(getAndroidVersionTextArea);
+            DeviceInfoUtil.getDeviceSoftwareVersion(getDeviceBuildVersionTextArea);
+            DeviceInfoUtil.getActivity(getActivityTextArea);
+            DeviceInfoUtil.getDpi(getDeviceDpiTextArea);
+            DeviceInfoUtil.getDeviceRam(getDeviceRamTextArea);
+            DeviceInfoUtil.getDeviceRom(getDeviceRomTextArea);
+            DeviceInfoUtil.getBatterySize(getBatterySizeTextArea);
+            DeviceInfoUtil.getBatteryHealth(getBatteryHealthTextArea);
+            DeviceInfoUtil.getBatteryUsbType(getBatteryUsbTypeTextArea);
         }else {
-            gatAndroidVersionTextArea.setText("");
-            gatDeviceBuildVersionTextArea.setText("");
-            gatActivityTextArea.setText("");
-            gatDeviceDpiTextArea.setText("");
+            getAndroidVersionTextArea.setText("");
+            getDeviceBuildVersionTextArea.setText("");
+            getActivityTextArea.setText("");
+            getDeviceDpiTextArea.setText("");
+            getDeviceRamTextArea.setText("");
+            getDeviceRomTextArea.setText("");
+            getBatterySizeTextArea.setText("");
+            getBatteryHealthTextArea.setText("");
+            getBatteryUsbTypeTextArea.setText("");
+            }
+    }
+
+    private void updateBatteryInfo() {
+        boolean isConnected = DeviceInfoUtil.isDeviceConnected();
+        if(isConnected){
+            DeviceInfoUtil.getBatteryCapacity(getBatteryCapacityTextArea);
+            DeviceInfoUtil.getBatterySize(getBatterySizeTextArea);
+            DeviceInfoUtil.getBatteryCurrentNow(getCurrentNowTextArea);
+            DeviceInfoUtil.getBatteryCurrentAvg(getCurrentAvgTextArea);
+            DeviceInfoUtil.getBatteryVoltageNow(getVoltageNowTextArea);
+            DeviceInfoUtil.getBatteryVoltageAvg(getVoltageAvgTextArea);
+            DeviceInfoUtil.getBatteryStatus(getBatteryStatusTextArea);
+            DeviceInfoUtil.getBatteryTemp(getBatteryTempTextArea);
+            DeviceInfoUtil.getBatteryTempAmbient(getBatteryTempAmbientTextArea);
+            DeviceInfoUtil.getBatteryTechnology(getBatteryTechnologyTextArea);
+            DeviceInfoUtil.getBatteryTimeFullToNow(getBatteryTimeFullToNowTextArea);
+        }else {
+            getBatteryCapacityTextArea.setText("");
+            getBatterySizeTextArea.setText("");
+            getCurrentNowTextArea.setText("");
+            getCurrentAvgTextArea.setText("");
+            getVoltageNowTextArea.setText("");
+            getVoltageAvgTextArea.setText("");
+            getBatteryStatusTextArea.setText("");
+            getBatteryTempTextArea.setText("");
+            getBatteryTempAmbientTextArea.setText("");
+            getBatteryTechnologyTextArea.setText("");
+            getBatteryTimeFullToNowTextArea.setText("");
         }
     }
 
@@ -298,11 +362,11 @@ public class DeviceInfoController implements Initializable{
                 }
                 targetTab = gpuTab;
                 break;
-            case "Disp":
-                if (displayTab == null) {
-                    displayTab = createTab("Disp", "/xml/DisplayInfoTab.fxml");
+            case "Mem":
+                if (memoryTab == null) {
+                    memoryTab = createTab("Mem", "/xml/MemoryInfoTab.fxml");
                 }
-                targetTab = displayTab;
+                targetTab = memoryTab;
                 break;
             case "功能":
                 if (specialFunctionTab == null) {
@@ -354,7 +418,7 @@ public class DeviceInfoController implements Initializable{
                 switch (title) {
                     case "CPU": cpuTab = null; break;
                     case "GPU": gpuTab = null; break;
-                    case "Disp": displayTab = null; break;
+                    case "Mem": memoryTab = null; break;
                     case "功能": specialFunctionTab = null; break;
                     case "解锁": deviceUnlockTab = null; break;
                     case "Spd": spdTab = null; break;
@@ -404,6 +468,8 @@ public class DeviceInfoController implements Initializable{
         if (statusCheckTimeline != null) {
             statusCheckTimeline.stop();
         }
+
+        DeviceInfoUtil.onDeviceDisconnected();
 
         DeviceInfoUtil.shutdownExecutor();
     }
