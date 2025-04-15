@@ -2,7 +2,6 @@ package com.monitor.utils;
 
 import com.monitor.thread.CustomThreadFactory;
 import javafx.application.Platform;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -38,7 +37,7 @@ public class DeviceInfoUtil {
      */
     private static String batteryBasePath = null;
 
-    private static final Object batteryPathLock = new Object();
+    private static final Object BATTERYPATHLOCK = new Object();
 
     /**
      * 候选电池路径列表（按优先级排序）
@@ -466,6 +465,160 @@ public class DeviceInfoUtil {
     }
 
     /**
+     * 获取设备XDPI
+     */
+    public static void getDeviceXDpi(TextArea getDeviceXDpiTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell dumpsys display");
+                String xDpi = parseXDpi(output);
+                Platform.runLater(() -> getDeviceXDpiTextArea.setText(Objects.requireNonNullElse(xDpi, "Unknown")));
+            } catch (Exception e) {
+                Platform.runLater(() -> getDeviceXDpiTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 获取设备YDPI
+     */
+    public static void getDeviceYDpi(TextArea getDeviceYDpiTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell dumpsys display");
+                String yDpi = parseYDpi(output);
+                Platform.runLater(() -> getDeviceYDpiTextArea.setText(Objects.requireNonNullElse(yDpi, "Unknown")));
+            } catch (Exception e) {
+                Platform.runLater(() -> getDeviceYDpiTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 解析XDPI
+     */
+    private static String parseXDpi(String output) {
+        Pattern pattern = Pattern.compile("mActiveSfDisplayMode=.*?xDpi=([\\d.]+)");
+        Matcher matcher = pattern.matcher(output);
+        return matcher.find() ? matcher.group(1) : null;
+    }
+
+    /**
+     * 解析YDPI
+     */
+    private static String parseYDpi(String output) {
+        Pattern pattern = Pattern.compile("mActiveSfDisplayMode=.*?yDpi=([\\d.]+)");
+        Matcher matcher = pattern.matcher(output);
+        return matcher.find() ? matcher.group(1) : null;
+    }
+
+    /**
+     * 获取纯白最高尼特值
+     */
+    public static void getScreenWhiteNit(TextArea getScreenWhiteNitTextArea) {
+        executeAdbCommandAndUpdateLabel(
+                ADB_PATH + " shell dumpsys display | grep mMaxLuminance",
+                getScreenWhiteNitTextArea,
+                "Unknown",
+                "mMaxLuminance=([\\d.]+)"
+        );
+    }
+
+    /**
+     * 获取常规最高尼特值
+     */
+    public static void getScreenNormalNit(TextArea getScreenNormalNitTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell dumpsys display | grep mBrightnessLevelsNits");
+                String[] nits = output.split("[,\\s\\[\\]]+");
+                String lastNit = nits.length > 0 ? nits[nits.length - 1] : "Unknown";
+                Platform.runLater(() -> getScreenNormalNitTextArea.setText(lastNit));
+            } catch (Exception e) {
+                Platform.runLater(() -> getScreenNormalNitTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 获取亮度级别Lux和Nits数组
+     */
+    public static void getScreenLuxLevel(TextArea getScreenLuxLevelTextArea) {
+        executeAdbCommandAndUpdateLabel(
+                ADB_PATH + " shell dumpsys display | grep mBrightnessLevelsLux",
+                getScreenLuxLevelTextArea,
+                "Unknown",
+                "mBrightnessLevelsLux=\\s*\\[([^]]+)\\]"
+        );
+    }
+    public static void getScreenNitLevel(TextArea getScreenNitLevelTextArea) {
+        executeAdbCommandAndUpdateLabel(
+                ADB_PATH + " shell dumpsys display | grep mBrightnessLevelsNits",
+                getScreenNitLevelTextArea,
+                "Unknown",
+                "mBrightnessLevelsNits=\\s*\\[([^]]+)\\]"
+        );
+    }
+
+    /**
+     * 获取所有DisplayMode挡位及刷新率
+     */
+    public static void getAllScreenRefreshRateLevels(TextArea getScreenBrightnessTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell dumpsys display");
+                Pattern pattern = Pattern.compile("DisplayMode\\{id=(\\d+).*?refreshRate=([\\d.]+)");
+                Matcher matcher = pattern.matcher(output);
+                StringBuilder result = new StringBuilder();
+                while (matcher.find()) {
+                    result.append("挡位").append(matcher.group(1)).append(": ").append(matcher.group(2)).append("Hz\n");
+                }
+                Platform.runLater(() -> getScreenBrightnessTextArea.setText(result.toString().trim()));
+            } catch (Exception e) {
+                Platform.runLater(() -> getScreenBrightnessTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 获取当前DisplayMode挡位及刷新率
+     */
+    public static void getCurrentDisplayMode(TextArea getScreenRefreshRateTextArea) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell dumpsys display");
+                Pattern pattern = Pattern.compile("mActiveSfDisplayMode=.*?id=(\\d+).*?refreshRate=([\\d.]+)");
+                Matcher matcher = pattern.matcher(output);
+                if (matcher.find()) {
+                    String mode = "挡位" + matcher.group(1) + ": " + matcher.group(2) + "Hz";
+                    Platform.runLater(() -> getScreenRefreshRateTextArea.setText(mode));
+                } else {
+                    Platform.runLater(() -> getScreenRefreshRateTextArea.setText("Unknown"));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> getScreenRefreshRateTextArea.setText("error"));
+            }
+        });
+    }
+
+    /**
+     * 通用带正则匹配的命令执行方法
+     */
+    private static void executeAdbCommandAndUpdateLabel(String command, TextArea textArea, String defaultValue, String regex) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(command);
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(output);
+                String result = matcher.find() ? matcher.group(1) : defaultValue;
+                Platform.runLater(() -> textArea.setText(result));
+            } catch (Exception e) {
+                Platform.runLater(() -> textArea.setText("error"));
+            }
+        });
+    }
+
+    /**
      * 动态检测电池路径（线程安全）
      */
     private static synchronized void detectBatteryPath() throws IOException {
@@ -497,7 +650,7 @@ public class DeviceInfoUtil {
      * 当检测到设备断开或重新连接时
      */
     public static void onDeviceDisconnected() {
-        synchronized (batteryPathLock) {
+        synchronized (BATTERYPATHLOCK) {
             batteryBasePath = null;
         }
     }
@@ -538,8 +691,9 @@ public class DeviceInfoUtil {
      */
     private static synchronized void ensureBatteryPathInitialized() throws IOException {
         if (batteryBasePath == null) {
-            synchronized (batteryPathLock) {
-                if (batteryBasePath == null) { // 双重检查锁定
+            synchronized (BATTERYPATHLOCK) {
+                // 双重检查锁定
+                if (batteryBasePath == null) {
                     detectBatteryPath();
                 }
             }

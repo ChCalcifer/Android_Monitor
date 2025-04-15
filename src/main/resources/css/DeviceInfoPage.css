@@ -218,6 +218,46 @@
     -fx-border-width: 0;  /* 去除滚动区域的边框 */
 }
 
+.tabsHbox-text-area-height {
+    -fx-font-family: "Arial";
+    -fx-font-size: 12px;  /* 缩小字体以适配高度 */
+    -fx-opacity: 1.0;  /* 完全不透明 */
+    -fx-wrap-text: true;
+    -fx-pref-height: 45px;
+    -fx-max-height: 45px;
+    -fx-min-height: 45px;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-focus-traversable: false;  /* 禁用焦点边框 */
+    -fx-background-color: transparent;  /* 去除背景 */
+}
+
+.tabsHbox-text-area-height .scroll-pane .content {
+    -fx-background-color: #FFF; /* 去除滚动区域的背景 */
+    -fx-border-width: 0;  /* 去除滚动区域的边框 */
+}
+
+.tabsHbox-text-area-height-O {
+    -fx-font-family: "Arial";
+    -fx-font-size: 12px;  /* 缩小字体以适配高度 */
+    -fx-opacity: 1.0;  /* 完全不透明 */
+    -fx-wrap-text: true;
+    -fx-pref-height: 55px;
+    -fx-max-height: 55px;
+    -fx-min-height: 55px;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-focus-traversable: false;  /* 禁用焦点边框 */
+    -fx-background-color: transparent;  /* 去除背景 */
+}
+
+.tabsHbox-text-area-height-O .scroll-pane .content {
+    -fx-background-color: #FFF; /* 去除滚动区域的背景 */
+    -fx-border-width: 0;  /* 去除滚动区域的边框 */
+}
+
 .titled-pane {
     -fx-background-color: white;
 }

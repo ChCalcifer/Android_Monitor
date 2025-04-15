@@ -248,13 +248,13 @@
                                  </HBox>
                                  <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                                      <Region prefWidth="0" />
-                                     <Label text="DPI        "/>
+                                     <Label text="XDPI        "/>
                                      <TextArea fx:id="getDeviceXDpiTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
                                                styleClass="tabsHbox-text-area"
                                                wrapText="true" />
-                                     <Label text="分辨率   "/>
+                                     <Label text="YDPI        "/>
                                      <TextArea fx:id="getDeviceYDpiTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
@@ -263,13 +263,13 @@
                                  </HBox>
                                  <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                                      <Region prefWidth="0" />
-                                     <Label text="当前帧率"/>
+                                     <Label text="FPS"/>
                                      <TextArea fx:id="getScreenFpsTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
                                                styleClass="tabsHbox-text-area"
                                                wrapText="true" />
-                                     <Label text="FPS"/>
+                                     <Label text="刷新率"/>
                                      <TextArea fx:id="getScreenRefreshRateTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
@@ -296,7 +296,7 @@
                                      <Label text="刷新率挡位及相应数值"/>
                                      <TextArea fx:id="getScreenBrightnessTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
-                                               prefHeight="25" prefWidth="200"
+                                               prefHeight="25" prefWidth="580"
                                                styleClass="tabsHbox-text-area"
                                                wrapText="true" />
                                  </HBox>
@@ -304,18 +304,18 @@
                                      <Region prefWidth="0" />
                                      <Label text="尼特值分布"/>
                                      <TextArea fx:id="getScreenNitLevelTextArea" editable="false"
-                                               maxHeight="25" minHeight="25"
-                                               prefHeight="25" prefWidth="400"
-                                               styleClass="tabsHbox-text-area"
+                                               maxHeight="55" minHeight="55"
+                                               prefHeight="55" prefWidth="580"
+                                               styleClass="tabsHbox-text-area-height-O"
                                                wrapText="true" />
                                  </HBox>
                                  <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                                      <Region prefWidth="0" />
                                      <Label text="光照强度分布"/>
                                      <TextArea fx:id="getScreenLuxLevelTextArea" editable="false"
-                                               maxHeight="25" minHeight="25"
-                                               prefHeight="25" prefWidth="400"
-                                               styleClass="tabsHbox-text-area"
+                                               maxHeight="45" minHeight="45"
+                                               prefHeight="45" prefWidth="580"
+                                               styleClass="tabsHbox-text-area-height"
                                                wrapText="true" />
                                  </HBox>
                              </VBox>
