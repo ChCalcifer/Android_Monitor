@@ -1,0 +1,24 @@
+/* 为CPU标签页设置背景色 */
+.cpu-tab-container {
+    -fx-background-color: #FFFFFF;
+}
+
+/* CpuInfoPage.css 新增 */
+.chart-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.axis-label {
+    -fx-font-size: 12px;
+}
+
+.default-color0.chart-series-line { -fx-stroke: #2ecc71; } /* 绿色 */
+.default-color1.chart-series-line { -fx-stroke: #e74c3c; } /* 红色 */
+.default-color2.chart-series-line { -fx-stroke: #3498db; } /* 蓝色 */
+.default-color3.chart-series-line { -fx-stroke: #f1c40f; } /* 黄色 */
+
+.chart-line-symbol {
+    -fx-background-radius: 2px;
+    -fx-padding: 2px;
+}

@@ -67,7 +67,7 @@ public class DeviceInfoUtil {
      * 异步线程池。
      */
     private static final ExecutorService executorService = new ThreadPoolExecutor(
-            5, 15, 60, TimeUnit.SECONDS,
+            5, 30, 60, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(),
             new CustomThreadFactory("DeviceInfoUtil-Pool")
     );
@@ -99,7 +99,7 @@ public class DeviceInfoUtil {
      */
     public static void getDeviceModel(TextArea getDeviceModelTextArea) {
         // 使用线程池来执行任务
-        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.product.model",
+        executeAdbCommandAndUpdate(ADB_PATH + " shell getprop ro.product.model",
                 getDeviceModelTextArea, "");
     }
 
@@ -108,7 +108,7 @@ public class DeviceInfoUtil {
      */
     public static void getDeviceBuildVersion(TextArea getDeviceBuildDateTextArea) {
         // 使用线程池来执行任务
-        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.version.incremental",
+        executeAdbCommandAndUpdate(ADB_PATH + " shell getprop ro.build.version.incremental",
                 getDeviceBuildDateTextArea, "");
     }
 
@@ -151,7 +151,7 @@ public class DeviceInfoUtil {
      * 软件版本 获取软件版本。
      */
     public static void getDeviceSoftwareVersion(TextArea getDeviceBuildVersionTextArea) {
-        executeAdbCommandAndUpdateLabel(ADB_PATH + " shell getprop ro.build.display.id",
+        executeAdbCommandAndUpdate(ADB_PATH + " shell getprop ro.build.display.id",
                 getDeviceBuildVersionTextArea, "Unknown");
     }
 
@@ -325,10 +325,10 @@ public class DeviceInfoUtil {
                 long usedBlocks = Long.parseLong(matcher.group(3));
                 long freeBlocks = Long.parseLong(matcher.group(4));
                 // 转换为 GB，并取整
-                long totalGB = (long) Math.floor(totalBlocks / 1024.0 / 1024.0);
-                long usedGB = (long) Math.floor(usedBlocks / 1024.0 / 1024.0);
-                long freeGB = (long) Math.floor(freeBlocks / 1024.0 / 1024.0);
-                return "总:" + totalGB + "GB   " + "已用:" + usedGB +  "GB   " + "可用:" + freeGB + "GB";
+                long totalGb = (long) Math.floor(totalBlocks / 1024.0 / 1024.0);
+                long usedGb = (long) Math.floor(usedBlocks / 1024.0 / 1024.0);
+                long freeGb = (long) Math.floor(freeBlocks / 1024.0 / 1024.0);
+                return "总:" + totalGb + "GB   " + "已用:" + usedGb +  "GB   " + "可用:" + freeGb + "GB";
             }
         }
         return "Unknown";
@@ -359,15 +359,15 @@ public class DeviceInfoUtil {
 
         if (matcher.find()) {
             // 获取总内存和可用内存（单位：KB）
-            long totalKB = Long.parseLong(matcher.group(1));
-            long availableKB = Long.parseLong(matcher.group(2));
+            long totalKb = Long.parseLong(matcher.group(1));
+            long availableKb = Long.parseLong(matcher.group(2));
 
             // 将内存从 KB 转换为 GB，使用 Math.round() 进行四舍五入
-            long totalGB = Math.round(totalKB / 1024.0 / 1024.0);
-            long availableGB = Math.round(availableKB / 1024.0 / 1024.0);
+            long totalGb = Math.round(totalKb / 1024.0 / 1024.0);
+            long availableGb = Math.round(availableKb / 1024.0 / 1024.0);
 
             // 返回结果（总内存和可用内存）
-            return "总: " + totalGB + " GB   可用: " + availableGB + " GB";
+            return "总: " + totalGb + " GB   可用: " + availableGb + " GB";
         }
 
         return "Unknown";
@@ -467,14 +467,14 @@ public class DeviceInfoUtil {
     /**
      * 获取设备XDPI
      */
-    public static void getDeviceXDpi(TextArea getDeviceXDpiTextArea) {
+    public static void getDeviceXdpi(TextArea getDeviceXdpiTextArea) {
         executorService.submit(() -> {
             try {
                 String output = executeCommand(ADB_PATH + " shell dumpsys display");
-                String xDpi = parseXDpi(output);
-                Platform.runLater(() -> getDeviceXDpiTextArea.setText(Objects.requireNonNullElse(xDpi, "Unknown")));
+                String xDpi = parseXdpi(output);
+                Platform.runLater(() -> getDeviceXdpiTextArea.setText(Objects.requireNonNullElse(xDpi, "Unknown")));
             } catch (Exception e) {
-                Platform.runLater(() -> getDeviceXDpiTextArea.setText("error"));
+                Platform.runLater(() -> getDeviceXdpiTextArea.setText("error"));
             }
         });
     }
@@ -482,14 +482,14 @@ public class DeviceInfoUtil {
     /**
      * 获取设备YDPI
      */
-    public static void getDeviceYDpi(TextArea getDeviceYDpiTextArea) {
+    public static void getDeviceYdpi(TextArea getDeviceYdpiTextArea) {
         executorService.submit(() -> {
             try {
                 String output = executeCommand(ADB_PATH + " shell dumpsys display");
-                String yDpi = parseYDpi(output);
-                Platform.runLater(() -> getDeviceYDpiTextArea.setText(Objects.requireNonNullElse(yDpi, "Unknown")));
+                String yDpi = parseYdpi(output);
+                Platform.runLater(() -> getDeviceYdpiTextArea.setText(Objects.requireNonNullElse(yDpi, "Unknown")));
             } catch (Exception e) {
-                Platform.runLater(() -> getDeviceYDpiTextArea.setText("error"));
+                Platform.runLater(() -> getDeviceYdpiTextArea.setText("error"));
             }
         });
     }
@@ -497,7 +497,7 @@ public class DeviceInfoUtil {
     /**
      * 解析XDPI
      */
-    private static String parseXDpi(String output) {
+    private static String parseXdpi(String output) {
         Pattern pattern = Pattern.compile("mActiveSfDisplayMode=.*?xDpi=([\\d.]+)");
         Matcher matcher = pattern.matcher(output);
         return matcher.find() ? matcher.group(1) : null;
@@ -506,7 +506,7 @@ public class DeviceInfoUtil {
     /**
      * 解析YDPI
      */
-    private static String parseYDpi(String output) {
+    private static String parseYdpi(String output) {
         Pattern pattern = Pattern.compile("mActiveSfDisplayMode=.*?yDpi=([\\d.]+)");
         Matcher matcher = pattern.matcher(output);
         return matcher.find() ? matcher.group(1) : null;
@@ -622,7 +622,9 @@ public class DeviceInfoUtil {
      * 动态检测电池路径（线程安全）
      */
     private static synchronized void detectBatteryPath() throws IOException {
-        if (batteryBasePath != null) return;
+        if (batteryBasePath != null) {
+            return;
+        }
 
         for (String path : BATTERY_PATH_CANDIDATES) {
             // 检查路径是否存在且包含关键文件
@@ -703,7 +705,7 @@ public class DeviceInfoUtil {
     /**
      * 通用方法：执行ADB命令并更新Label
      */
-    private static void executeAdbCommandAndUpdateLabel(String command, TextArea textArea, String defaultValue) {
+    private static void executeAdbCommandAndUpdate(String command, TextArea textArea, String defaultValue) {
         executorService.submit(() -> {
             try {
                 String output = executeCommand(command);

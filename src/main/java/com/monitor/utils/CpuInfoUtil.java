@@ -1,5 +1,6 @@
 package com.monitor.utils;
 
+import com.monitor.thread.CustomThreadFactory;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -15,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,16 +43,8 @@ public class CpuInfoUtil {
      * 异步线程池。
      */
     private static final ExecutorService executorService = new ThreadPoolExecutor(
-            // 核心线程数
-            10,
-            // 最大线程数
-            50,
-            // 线程空闲时的最大存活时间（秒）
-            60,
-            // 时间单位
-            TimeUnit.SECONDS,
-            // 任务队列
-            new LinkedBlockingQueue<>()
+            2, 10, 60, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(),new CustomThreadFactory("CpuInfoUtil-Pool")
     );
 
     /**
@@ -58,14 +52,24 @@ public class CpuInfoUtil {
      */
     public static List<String> getCpuFrequencies() {
         try {
-            // 增加超时和错误处理
-            String output = executeCommand(ADB_PATH + " shell \"cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2> /dev/null\"");
-            List<String> result = parseCpuFrequencies(output);
-            return result.isEmpty() ?
-                    Collections.singletonList("No frequency data") : result;
+            String output = executeCommand(ADB_PATH + " shell \"for i in $(seq 0 3); do cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq; done\"");
+            return parseCpuFrequencies(output);
         } catch (Exception e) {
-            return Collections.singletonList("ADB Error: " + e.getMessage());
+            return Collections.singletonList("Error: " + e.getMessage());
         }
+    }
+
+    // CpuInfoUtil.java 修改getCpuFrequencies为异步
+
+    public static void getCpuFrequenciesAsync(Consumer<List<String>> callback) {
+        executorService.submit(() -> {
+            try {
+                String output = executeCommand(ADB_PATH + " shell \"for i in $(seq 0 3); do cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq; done\"");
+                callback.accept(parseCpuFrequencies(output));
+            } catch (Exception e) {
+                callback.accept(Collections.singletonList("Error" +  e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -82,6 +86,15 @@ public class CpuInfoUtil {
             frequencies.add(String.format("CPU%d %.1f ", coreIndex++, mhz));
         }
         return frequencies.isEmpty() ? Collections.singletonList("N/A") : frequencies;
+    }
+
+    public static int getCpuCoreCount() {
+        try {
+            String output = executeCommand(ADB_PATH + " shell ls /sys/devices/system/cpu/ | grep 'cpu[0-9]'");
+            return output.split("\n").length;
+        } catch (Exception e) {
+            return 4;
+        }
     }
 
     /**

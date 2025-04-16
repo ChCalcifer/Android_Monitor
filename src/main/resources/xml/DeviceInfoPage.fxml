@@ -10,7 +10,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.layout.Region?>
@@ -67,9 +66,9 @@
                          BorderPane.alignment="CENTER">
                     <Tab fx:id="deviceTab" text="信息">
                     <ScrollPane fitToWidth="true">
-                     <VBox spacing="10" maxWidth="Infinity" fillWidth="true">
-                         <TitledPane text="基本信息" animated="true" expanded="true">
-                         <VBox maxWidth="Infinity" fillWidth="true">
+                     <VBox spacing="10">
+                         <TitledPane text="基本信息">
+                         <VBox>
                          <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                              <Region prefWidth="0" />
                              <Label text="设备型号"/>
@@ -126,7 +125,7 @@
                          </HBox>
                         </VBox>
                          </TitledPane>
-                         <TitledPane text="电池信息" animated="true">
+                         <TitledPane text="电池信息">
                              <VBox>
                                  <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                                      <Region prefWidth="0" />
@@ -229,7 +228,7 @@
                                  </HBox>
                              </VBox>
                          </TitledPane>
-                         <TitledPane text="屏幕信息" animated="true">
+                         <TitledPane text="屏幕信息">
                              <VBox>
                                  <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                                      <Region prefWidth="0" />
@@ -249,13 +248,13 @@
                                  <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
                                      <Region prefWidth="0" />
                                      <Label text="XDPI        "/>
-                                     <TextArea fx:id="getDeviceXDpiTextArea" editable="false"
+                                     <TextArea fx:id="getDeviceXdpiTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
                                                styleClass="tabsHbox-text-area"
                                                wrapText="true" />
                                      <Label text="YDPI        "/>
-                                     <TextArea fx:id="getDeviceYDpiTextArea" editable="false"
+                                     <TextArea fx:id="getDeviceYdpiTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
                                                styleClass="tabsHbox-text-area"
@@ -288,15 +287,6 @@
                                      <TextArea fx:id="getScreenNormalNitTextArea" editable="false"
                                                maxHeight="25" minHeight="25"
                                                prefHeight="25" prefWidth="200"
-                                               styleClass="tabsHbox-text-area"
-                                               wrapText="true" />
-                                 </HBox>
-                                 <HBox prefHeight="80" spacing="50" alignment="CENTER_LEFT">
-                                     <Region prefWidth="0" />
-                                     <Label text="刷新率挡位及相应数值"/>
-                                     <TextArea fx:id="getScreenBrightnessTextArea" editable="false"
-                                               maxHeight="25" minHeight="25"
-                                               prefHeight="25" prefWidth="580"
                                                styleClass="tabsHbox-text-area"
                                                wrapText="true" />
                                  </HBox>

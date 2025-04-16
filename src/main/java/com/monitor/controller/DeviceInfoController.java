@@ -76,14 +76,14 @@ public class DeviceInfoController implements Initializable{
             getBatteryTechnologyTextArea,
             getBatteryTimeFullToNowTextArea,
             getBatteryUsbTypeTextArea,
-            getDeviceXDpiTextArea,
-            getDeviceYDpiTextArea,
+            getDeviceXdpiTextArea,
+            getDeviceYdpiTextArea,
             getScreenWhiteNitTextArea,
             getScreenNormalNitTextArea,
-            getScreenBrightnessTextArea,
             getScreenNitLevelTextArea,
             getScreenLuxLevelTextArea,
-            getScreenRefreshRateTextArea;
+            getScreenRefreshRateTextArea,
+            getScreenFpsTextArea;
 
     @FXML
     private Tab deviceTab;
@@ -262,15 +262,15 @@ public class DeviceInfoController implements Initializable{
             DeviceInfoUtil.getBatteryHealth(getBatteryHealthTextArea);
             DeviceInfoUtil.getBatteryUsbType(getBatteryUsbTypeTextArea);
         }else {
-            getAndroidVersionTextArea.setText("");
-            getDeviceBuildVersionTextArea.setText("");
-            getActivityTextArea.setText("");
-            getDeviceDpiTextArea.setText("");
-            getDeviceRamTextArea.setText("");
-            getDeviceRomTextArea.setText("");
-            getBatterySizeTextArea.setText("");
-            getBatteryHealthTextArea.setText("");
-            getBatteryUsbTypeTextArea.setText("");
+            getAndroidVersionTextArea.setText("N/A");
+            getDeviceBuildVersionTextArea.setText("N/A");
+            getActivityTextArea.setText("N/A");
+            getDeviceDpiTextArea.setText("N/A");
+            getDeviceRamTextArea.setText("N/A");
+            getDeviceRomTextArea.setText("N/A");
+            getBatterySizeTextArea.setText("N/A");
+            getBatteryHealthTextArea.setText("N/A");
+            getBatteryUsbTypeTextArea.setText("N/A");
             }
     }
 
@@ -289,12 +289,12 @@ public class DeviceInfoController implements Initializable{
             DeviceInfoUtil.getBatteryTechnology(getBatteryTechnologyTextArea);
             DeviceInfoUtil.getBatteryTimeFullToNow(getBatteryTimeFullToNowTextArea);
         }else {
-            getBatteryCapacityTextArea.setText("");
-            getBatterySizeTextArea.setText("");
-            getCurrentNowTextArea.setText("");
-            getCurrentAvgTextArea.setText("");
-            getVoltageNowTextArea.setText("");
-            getVoltageAvgTextArea.setText("");
+            getBatteryCapacityTextArea.setText("N/A");
+            getBatterySizeTextArea.setText("N/A");
+            getCurrentNowTextArea.setText("N/A");
+            getCurrentAvgTextArea.setText("N/A");
+            getVoltageNowTextArea.setText("N/A");
+            getVoltageAvgTextArea.setText("N/A");
             getBatteryStatusTextArea.setText("");
             getBatteryTempTextArea.setText("");
             getBatteryTempAmbientTextArea.setText("");
@@ -306,22 +306,20 @@ public class DeviceInfoController implements Initializable{
     private void updateScreenInfo() {
         boolean isConnected = DeviceInfoUtil.isDeviceConnected();
         if(isConnected){
-            DeviceInfoUtil.getDeviceXDpi(getDeviceXDpiTextArea);
-            DeviceInfoUtil.getDeviceYDpi(getDeviceYDpiTextArea);
+            DeviceInfoUtil.getDeviceXdpi(getDeviceXdpiTextArea);
+            DeviceInfoUtil.getDeviceYdpi(getDeviceYdpiTextArea);
             DeviceInfoUtil.getScreenWhiteNit(getScreenWhiteNitTextArea);
             DeviceInfoUtil.getScreenNormalNit(getScreenNormalNitTextArea);
             DeviceInfoUtil.getScreenLuxLevel(getScreenLuxLevelTextArea);
             DeviceInfoUtil.getScreenNitLevel(getScreenNitLevelTextArea);
-            DeviceInfoUtil.getAllScreenRefreshRateLevels(getScreenBrightnessTextArea);
             DeviceInfoUtil.getCurrentDisplayMode(getScreenRefreshRateTextArea);
         }else {
-            getDeviceXDpiTextArea.setText("");
-            getDeviceYDpiTextArea.setText("");
+            getDeviceXdpiTextArea.setText("");
+            getDeviceYdpiTextArea.setText("");
             getScreenWhiteNitTextArea.setText("");
             getScreenNormalNitTextArea.setText("");
             getScreenLuxLevelTextArea.setText("");
             getScreenNitLevelTextArea.setText("");
-            getScreenBrightnessTextArea.setText("");
             getScreenRefreshRateTextArea.setText("");
         }
     }
