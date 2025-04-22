@@ -1,6 +1,7 @@
 package com.monitor.utils;
 
 import com.monitor.thread.CustomThreadFactory;
+import javafx.application.Platform;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -64,10 +65,24 @@ public class CpuInfoUtil {
     public static void getCpuFrequenciesAsync(Consumer<List<String>> callback) {
         executorService.submit(() -> {
             try {
-                String output = executeCommand(ADB_PATH + " shell \"for i in $(seq 0 3); do cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq; done\"");
+                // 获取所有核心（假设最多8核）
+                String output = executeCommand(ADB_PATH + " shell \"for i in $(seq 0 7); do cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq 2>/dev/null || echo 0; done\"");
                 callback.accept(parseCpuFrequencies(output));
             } catch (Exception e) {
-                callback.accept(Collections.singletonList("Error" +  e.getMessage()));
+                callback.accept(Collections.singletonList("Error: " + e.getMessage()));
+            }
+        });
+    }
+
+    public static void getCpuFrequencyAsync(int coreId, Consumer<Double> callback) {
+        executorService.submit(() -> {
+            try {
+                String cmd = String.format("adb shell cat /sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", coreId);
+                String output = executeCommand(cmd);
+                double mhz = Double.parseDouble(output.trim()) / 1000.0;
+                Platform.runLater(() -> callback.accept(mhz));
+            } catch (Exception e) {
+                Platform.runLater(() -> callback.accept(0.0));
             }
         });
     }

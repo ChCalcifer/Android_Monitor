@@ -9,50 +9,30 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
-<AnchorPane xmlns="http://javafx.com/javafx"
+<?import org.jfree.chart.fx.ChartViewer?>
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.monitor.controller.CpuInfoController"
-            prefHeight="400.0" prefWidth="510.0"
             stylesheets="/css/CpuInfoPage.css"
-            styleClass="cpu-tab-container">
-        <BorderPane prefHeight="400" prefWidth="510"
-                    AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
-                    AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-            <center>
-                <VBox spacing="15">
-                    <!-- 上半部分：0-3号CPU -->
-                    <VBox spacing="5">
-                        <HBox fx:id="upperCheckBoxContainer"
-                              spacing="10"
-                              style="-fx-padding: 10; -fx-background-color: #f8f9fa;"/>
-                        <LineChart fx:id="upperChart" prefHeight="250">
-                            <xAxis>
-                                <NumberAxis fx:id="upperXAxis" label="时间（秒）" />
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis fx:id="upperYAxis" label="频率 (MHz)"/>
-                            </yAxis>
-                        </LineChart>
-                    </VBox>
+            prefHeight="600" prefWidth="800">
 
-                    <!-- 分割线 -->
-                    <Separator style="-fx-padding: 5 0;"/>
+    <top>
+        <HBox spacing="15" style="-fx-padding: 10; -fx-background-color: #f8f9fa;">
+            <!-- 大核复选框容器 -->
+            <HBox spacing="5">
+                <Label text="大核" style="-fx-font-weight: bold;"/>
+                <HBox fx:id="bigCoreCheckBoxContainer" spacing="5"/>
+            </HBox>
 
-                    <!-- 下半部分：4-7号CPU -->
-                    <VBox spacing="5">
-                        <HBox fx:id="lowerCheckBoxContainer"
-                              spacing="10"
-                              style="-fx-padding: 10; -fx-background-color: #f8f9fa;"/>
-                        <LineChart fx:id="lowerChart" prefHeight="250">
-                            <xAxis>
-                                <NumberAxis fx:id="lowerXAxis" label="时间（秒）" />
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis fx:id="lowerYAxis" label="频率 (MHz)"/>
-                            </yAxis>
-                        </LineChart>
-                    </VBox>
-                </VBox>
-            </center>
-        </BorderPane>
-</AnchorPane>
+            <!-- 小核复选框容器 -->
+            <HBox spacing="5">
+                <Label text="小核" style="-fx-font-weight: bold;"/>
+                <HBox fx:id="smallCoreCheckBoxContainer" spacing="5"/>
+            </HBox>
+        </HBox>
+    </top>
+
+    <center>
+        <ChartViewer fx:id="combinedChartViewer" prefHeight="500" prefWidth="800"/>
+    </center>
+</BorderPane>

@@ -14,15 +14,28 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.awt.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.Millisecond;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import java.awt.Color;
 
 /**
  * @Author CYC
@@ -31,180 +44,131 @@ import java.util.stream.Collectors;
  */
 
 public class CpuInfoController {
-    @FXML private LineChart<Number, Number> upperChart;
-    @FXML private LineChart<Number, Number> lowerChart;
-    @FXML private HBox upperCheckBoxContainer;
-    @FXML private HBox lowerCheckBoxContainer;
-    @FXML private NumberAxis upperXAxis;
-    @FXML private NumberAxis upperYAxis;
-    @FXML private NumberAxis lowerXAxis;
-    @FXML private NumberAxis lowerYAxis;
+    @FXML private ChartViewer combinedChartViewer;
+    @FXML private HBox bigCoreCheckBoxContainer;
+    @FXML private HBox smallCoreCheckBoxContainer;
 
-    private static final int MAX_DATA_POINTS = 30;
-    private final Map<Integer, XYChart.Series<Number, Number>> seriesMap = new ConcurrentHashMap<>();
-    private final Map<Integer, CheckBox> checkBoxMap = new ConcurrentHashMap<>();
-    private final Map<Integer, Deque<XYChart.Data<Number, Number>>> dataQueues = new ConcurrentHashMap<>();
-    private Timeline timeline;
-    private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
-    private final AtomicLong upperStartTime = new AtomicLong();
-    private final AtomicLong lowerStartTime = new AtomicLong();
-    private Timeline upperTimeline;
-    private Timeline lowerTimeline;
+    private final Map<Integer, TimeSeries> cpuSeriesMap = new ConcurrentHashMap<>();
+    private TimeSeriesCollection dataset;
+    private List<Integer> bigCores = new ArrayList<>();
+    private List<Integer> smallCores = new ArrayList<>();
+
+    private static final int MAX_DATA_POINTS = 100;
+    private Timeline dataPollingTimeline;
+
+    private final Set<Integer> selectedCores = ConcurrentHashMap.newKeySet();
+
+
 
     @FXML
-    private void initialize() {
-        setupCharts();
-        initializeCheckBoxes();
+    public void initialize() {
+        setupChart();
+        detectCoreTypes();
+        createCheckBoxes();
         startDataPolling();
     }
 
-    private void setupCharts() {
-        // 配置上半部分图表
-        upperXAxis.setAutoRanging(false);
-        upperXAxis.setLowerBound(0);
-        upperXAxis.setUpperBound(30);
-        upperYAxis.setAutoRanging(false);
-        upperYAxis.setLowerBound(500);
-        upperYAxis.setUpperBound(2300);
-        upperYAxis.setTickUnit(100);
-        upperChart.setAnimated(false);
-        upperChart.setCreateSymbols(false);
+    private void setupChart() {
+        dataset = new TimeSeriesCollection();
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                "CPU频率动态监控",
+                "时间（秒）",
+                "频率 (MHz)",
+                dataset,
+                true, true, false
+        );
 
-        // 配置下半部分图表
-        lowerXAxis.setAutoRanging(false);
-        lowerXAxis.setLowerBound(0);
-        lowerXAxis.setUpperBound(30);
-        lowerYAxis.setAutoRanging(false);
-        lowerYAxis.setLowerBound(500);
-        lowerYAxis.setUpperBound(2300);
-        lowerYAxis.setTickUnit(100);
-        lowerChart.setAnimated(false);
-        lowerChart.setCreateSymbols(false);
+        XYPlot plot = chart.getXYPlot();
+        plot.getDomainAxis().setAutoRange(true);
+        plot.setBackgroundPaint(java.awt.Color.WHITE);
+
+        combinedChartViewer.setChart(chart);
     }
 
-    private void initializeCheckBoxes() {
-        int coreCount = CpuInfoUtil.getCpuCoreCount();
-        for (int i = 0; i < coreCount; i++) {
-            CheckBox checkBox = new CheckBox("CPU " + i);
-            checkBox.setSelected(false);
-            dataQueues.put(i, new ArrayDeque<>(MAX_DATA_POINTS));
-
-            HBox targetContainer = i < 4 ? upperCheckBoxContainer : lowerCheckBoxContainer;
-            targetContainer.getChildren().add(checkBox);
-
-            int coreId = i;
-            checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                XYChart.Series<Number, Number> series = seriesMap.get(coreId);
-                if (series != null) {
-                    series.getNode().setVisible(newVal);
-                    if (newVal) {
-                        // 选中时重置时间起点
-                        if (coreId < 4) {
-                            upperStartTime.set(System.currentTimeMillis());
-                        } else {
-                            lowerStartTime.set(System.currentTimeMillis());
-                        }
-                    }
-                }
-            });
-
-            checkBoxMap.put(coreId, checkBox);
-            createSeriesForCore(coreId);
+    // 动态检测大核和小核（示例逻辑，需根据实际设备调整）
+    private void detectCoreTypes() {
+        // 假设核心0-3为小核，4-7为大核
+        int totalCores = CpuInfoUtil.getCpuCoreCount();
+        for (int i = 0; i < totalCores; i++) {
+            if (i < 4) {
+                smallCores.add(i);
+            } else {
+                bigCores.add(i);
+            }
         }
     }
 
-    private void createSeriesForCore(int coreId) {
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName("CPU " + coreId);
-        series.getNode().setVisible(false);
+    private void createCheckBoxes() {
+        // 创建小核复选框，只显示 CPU0
+        smallCores.stream()
+                .filter(core -> core == 0)
+                .forEach(core -> {
+                    CheckBox checkBox = new CheckBox("CPU " + core);
+                    checkBox.setSelected(false); // 默认选中
+                    checkBox.selectedProperty().addListener((obs, oldVal, newVal) ->
+                            toggleSeriesVisibility(core, newVal)
+                    );
+                    smallCoreCheckBoxContainer.getChildren().add(checkBox);
+                });
 
-        if (coreId < 4) {
-            upperChart.getData().add(series);
-        } else {
-            lowerChart.getData().add(series);
+        // 创建大核复选框，只显示 CPU7
+        bigCores.stream()
+                .filter(core -> core == 7)
+                .forEach(core -> {
+                    CheckBox checkBox = new CheckBox("CPU " + core);
+                    checkBox.setSelected(false); // 默认选中
+                    checkBox.selectedProperty().addListener((obs, oldVal, newVal) ->
+                            toggleSeriesVisibility(core, newVal)
+                    );
+                    bigCoreCheckBoxContainer.getChildren().add(checkBox);
+                });
+    }
+
+    private void toggleSeriesVisibility(int coreId, boolean visible) {
+        TimeSeries series = cpuSeriesMap.get(coreId);
+        if (series != null) {
+            if (visible) {
+                dataset.addSeries(series);
+            } else {
+                dataset.removeSeries(series);
+            }
         }
-        seriesMap.put(coreId, series);
     }
 
     private void startDataPolling() {
-        upperStartTime.set(System.currentTimeMillis());
-        lowerStartTime.set(System.currentTimeMillis());
-
-        // 上半部分图表时间轴
-        upperTimeline = new Timeline(new KeyFrame(Duration.millis(300), event -> {
-            CpuInfoUtil.getCpuFrequenciesAsync(frequencies -> {
-                Platform.runLater(() -> processUpperFrequencies(frequencies));
-            });
-        }));
-        upperTimeline.setCycleCount(Animation.INDEFINITE);
-        upperTimeline.play();
-
-        // 下半部分图表时间轴
-        lowerTimeline = new Timeline(new KeyFrame(Duration.millis(300), event -> {
-            CpuInfoUtil.getCpuFrequenciesAsync(frequencies -> {
-                Platform.runLater(() -> processLowerFrequencies(frequencies));
-            });
-        }));
-        lowerTimeline.setCycleCount(Animation.INDEFINITE);
-        lowerTimeline.play();
+        dataPollingTimeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.seconds(1),
+                        e -> CpuInfoUtil.getCpuFrequenciesAsync(this::updateChartData)
+                ));
+        dataPollingTimeline.setCycleCount(Animation.INDEFINITE);
+        dataPollingTimeline.play();
     }
 
-    private void processUpperFrequencies(List<String> frequencies) {
-        long currentTime = System.currentTimeMillis() - upperStartTime.get();
-        double seconds = currentTime / 1000.0;
-
+    private void updateChartData(List<String> frequencies) {
+        long timestamp = System.currentTimeMillis();
         frequencies.stream()
                 .filter(freq -> !freq.startsWith("Error"))
-                .filter(freq -> {
-                    int coreId = Integer.parseInt(freq.split(" ")[0].substring(3));
-                    return coreId < 4;
-                })
-                .forEach(freq -> processFrequency(freq, seconds, true));
-    }
+                .forEach(freq -> {
+                    String[] parts = freq.split(" ");
+                    int coreId = Integer.parseInt(parts[0].substring(3));
+                    double mhz = Double.parseDouble(parts[1]);
 
-    private void processLowerFrequencies(List<String> frequencies) {
-        long currentTime = System.currentTimeMillis() - lowerStartTime.get();
-        double seconds = currentTime / 1000.0;
+                    TimeSeries series = cpuSeriesMap.computeIfAbsent(coreId,
+                            k -> new TimeSeries("CPU " + coreId)
+                    );
 
-        frequencies.stream()
-                .filter(freq -> !freq.startsWith("Error"))
-                .filter(freq -> {
-                    int coreId = Integer.parseInt(freq.split(" ")[0].substring(3));
-                    return coreId >= 4;
-                })
-                .forEach(freq -> processFrequency(freq, seconds, false));
-    }
-
-    private void processFrequency(String freq, double seconds, boolean isUpper) {
-        String[] parts = freq.split(" ");
-        int coreId = Integer.parseInt(parts[0].substring(3));
-        double mhz = Double.parseDouble(parts[1]);
-
-        XYChart.Series<Number, Number> series = seriesMap.get(coreId);
-        if (series == null || !checkBoxMap.get(coreId).isSelected()) return;
-
-        Deque<XYChart.Data<Number, Number>> queue = dataQueues.get(coreId);
-        queue.addLast(new XYChart.Data<>(seconds, mhz));
-        if (queue.size() > MAX_DATA_POINTS) {
-            queue.removeFirst();
-        }
-
-        series.getData().setAll(queue);
-        updateXAxisRange(seconds, isUpper);
-    }
-
-    private void updateXAxisRange(double currentSeconds, boolean isUpper) {
-        NumberAxis xAxis = isUpper ? upperXAxis : lowerXAxis;
-        double lowerBound = Math.max(0, currentSeconds - 30);
-        double upperBound = Math.max(30, currentSeconds);
-        xAxis.setLowerBound(lowerBound);
-        xAxis.setUpperBound(upperBound);
+                    series.addOrUpdate(new Millisecond(new Date(timestamp)), mhz);
+                    if (series.getItemCount() > MAX_DATA_POINTS) {
+                        series.delete(0, series.getItemCount() - MAX_DATA_POINTS);
+                    }
+                });
     }
 
     @FXML
-    private void shutdown() {
-        if (upperTimeline != null) upperTimeline.stop();
-        if (lowerTimeline != null) lowerTimeline.stop();
-        CpuInfoUtil.shutdownExecutor();
+    public void shutdown() {
+        if (dataPollingTimeline != null) {
+            dataPollingTimeline.stop();
+        }
+        // 数据保留不清理
     }
 }
